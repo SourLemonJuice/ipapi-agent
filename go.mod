@@ -2,7 +2,10 @@ module github.com/SourLemonJuice/ipapi-agent
 
 go 1.24.6
 
-require github.com/gin-gonic/gin v1.10.1
+require (
+	github.com/gin-gonic/gin v1.10.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+)
 
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect
