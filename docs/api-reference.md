@@ -8,7 +8,7 @@ Response JSON:
 |--|--|--|--|
 |status|`success` or `failure`|`"success"`|string|
 |message|User-friendly message, **ONLY exists** when failure state. unsure content|`"Data source error"`|string|
-|dataSource|One of upstream data providers: `ip-api`|`"ip-api"`|string|
+|dataSource|One of upstream data providers: `ip-api.com`|`"ip-api.com"`|string|
 |country|Country common name|`"United Kingdom"`|string|
 |countryCode|ISO 3166 Country two-letters code|`"GB"`|string|
 |region|Region name|`"England"`|string|
