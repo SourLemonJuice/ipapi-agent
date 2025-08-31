@@ -17,3 +17,9 @@ Response JSON:
 |isp|Internet service provider(ISP) name|`"Sky UK Limited"`|string|
 |org|Organization name|`"Sky Broadband"`|string|
 |asn|Autonomous System Number|`"AS5607"`|string|
+
+Query strings:
+
+|Name|Description|Example|Value Range|
+|--|--|--|--|
+|cache|Force control whether the server uses its cache|`cache=false`|`true` or `false`|

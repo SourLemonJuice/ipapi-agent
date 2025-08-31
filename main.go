@@ -14,6 +14,11 @@ import (
 
 var queryCache *cache.Cache
 
+const (
+	ipExpiration     = 4 * time.Hour
+	domainExpiration = 2 * time.Minute
+)
+
 func main() {
 	router := gin.Default()
 
@@ -33,15 +38,26 @@ func getQuery(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNotFound)
 	}
 
-	var isIP bool
+	var addrIsIP bool
 	if net.ParseIP(addr) != nil {
-		isIP = true
+		addrIsIP = true
 	} else {
-		isIP = false
+		addrIsIP = false
+	}
+
+	var useCache bool
+	switch c.DefaultQuery("cache", "true") {
+	case "true":
+		useCache = true
+	case "false":
+		useCache = false
+	default:
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
 
 	var resp respstruct.Query
-	if val, found := queryCache.Get(addr); found {
+	if val, found := queryCache.Get(addr); found && useCache {
 		resp = val.(respstruct.Query)
 		// love cache ^_^
 		c.JSON(http.StatusOK, resp)
@@ -74,10 +90,10 @@ func getQuery(c *gin.Context) {
 		return
 	}
 
-	if isIP {
-		queryCache.Set(addr, resp, 4*time.Hour)
+	if addrIsIP {
+		queryCache.Set(addr, resp, ipExpiration)
 	} else {
-		queryCache.Set(addr, resp, 2*time.Minute)
+		queryCache.Set(addr, resp, domainExpiration)
 	}
 
 	c.JSON(http.StatusOK, resp)
