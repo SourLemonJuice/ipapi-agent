@@ -68,7 +68,7 @@ func (data *IpapiCom) Fill(resp *respstruct.Query) error {
 	// UTCOffset
 	resp.UTCOffset, err = data.getUTCOffset()
 	if err != nil {
-		return fmt.Errorf("Can not convert UTC offset: %w", err)
+		return fmt.Errorf("can not convert UTC offset: %w", err)
 	}
 
 	// ISP
@@ -76,7 +76,7 @@ func (data *IpapiCom) Fill(resp *respstruct.Query) error {
 	resp.Org = data.Org
 	resp.ASN, err = data.getASN()
 	if err != nil {
-		return fmt.Errorf("Can not convert ASN: %w", err)
+		return fmt.Errorf("can not convert ASN: %w", err)
 	}
 
 	return nil
@@ -87,7 +87,7 @@ func (data *IpapiCom) getUTCOffset() (int, error) {
 
 	tz, err := time.LoadLocation(data.Timezone)
 	if err != nil {
-		return 0, fmt.Errorf("Can't load API returned timezone: %w", err)
+		return 0, fmt.Errorf("can not load API returned timezone: %w", err)
 	}
 
 	_, offset_sec := time.Now().In(tz).Zone()
@@ -96,12 +96,12 @@ func (data *IpapiCom) getUTCOffset() (int, error) {
 
 func (data *IpapiCom) getASN() (string, error) {
 	if !strings.HasPrefix(data.AS, "AS") {
-		return "", errors.New("AS format error")
+		return "", errors.New("wrong AS format")
 	}
 
 	before, _, found := strings.Cut(data.AS, " ")
 	if !found {
-		return "", errors.New("AS format error")
+		return "", errors.New("wrong AS format")
 	}
 
 	return before, nil

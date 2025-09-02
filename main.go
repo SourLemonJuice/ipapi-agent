@@ -112,26 +112,28 @@ func getQuery(c *gin.Context) {
 
 // Convert query string that can contain IP address and domain into one safe IP address format.
 // Result won't be: empty string, invalid IP, unresolvable domain.
-func addrToIP(addr string) (string, net.IP, error) {
-	if addr == "" {
+func addrToIP(query string) (string, net.IP, error) {
+	if query == "" {
 		// string can be nil
-		return "", nil, errors.New("Empty IP/domain")
+		return "", nil, errors.New("empty IP/domain")
 	}
 
-	ip := net.ParseIP(addr)
+	// query is a real IP address
+	ip := net.ParseIP(query)
 	if ip != nil {
-		return addr, ip, nil
+		return query, ip, nil
 	}
 
-	ips, err := net.LookupHost(addr)
+	// query is a domain name
+	ipStrArr, err := net.LookupHost(query)
 	if err != nil {
-		return "", nil, fmt.Errorf("Lookup addr as domain failure: %w", err)
+		return "", nil, fmt.Errorf("lookup addr as domain failure: %w", err)
 	}
-	ip = net.ParseIP(ips[0])
+	ip = net.ParseIP(ipStrArr[0])
 	if ip == nil {
-		return "", nil, errors.New("Invalid domain IP address")
+		return "", nil, errors.New("invalid domain IP address")
 	}
-	return ips[0], ip, nil
+	return ipStrArr[0], ip, nil
 }
 
 // Check if the given IP is one of loopback, private, unspecified(0.0.0.0), or any non-global unicast address.
