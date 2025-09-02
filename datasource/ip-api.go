@@ -3,6 +3,7 @@ package datasource
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -27,33 +28,34 @@ func (data *IpapiCom) DoRequest(addr string) error {
 
 	resp, err := http.Get("http://ip-api.com/json/" + addr + "?fields=53003")
 	if err != nil {
-		return errors.New("API error")
+		return fmt.Errorf("API error: %w", err)
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
-		return errors.New("JSON parsing error")
+		return fmt.Errorf("JSON parsing error: %w", err)
 	}
 
 	return nil
 }
 
+// If failure, response OK with JSON message
 func (data *IpapiCom) IsSuccess() bool {
 	switch data.Status {
 	case "success":
 		return true
 	case "fail":
 		return false
-	default:
-		return false
 	}
+	return false
 }
 
 func (data *IpapiCom) GetMessage() string {
 	return data.Message
 }
 
+// If failure, response InternalServerError
 func (data *IpapiCom) Fill(resp *respstruct.Query) error {
 	var err error
 
@@ -66,7 +68,7 @@ func (data *IpapiCom) Fill(resp *respstruct.Query) error {
 	// UTCOffset
 	resp.UTCOffset, err = data.getUTCOffset()
 	if err != nil {
-		return err
+		return fmt.Errorf("Can not convert UTC offset: %w", err)
 	}
 
 	// ISP
@@ -74,7 +76,7 @@ func (data *IpapiCom) Fill(resp *respstruct.Query) error {
 	resp.Org = data.Org
 	resp.ASN, err = data.getASN()
 	if err != nil {
-		return err
+		return fmt.Errorf("Can not convert ASN: %w", err)
 	}
 
 	return nil
@@ -85,7 +87,7 @@ func (data *IpapiCom) getUTCOffset() (int, error) {
 
 	tz, err := time.LoadLocation(data.Timezone)
 	if err != nil {
-		return 0, errors.New("Can't load API returned timezone")
+		return 0, fmt.Errorf("Can't load API returned timezone: %w", err)
 	}
 
 	_, offset_sec := time.Now().In(tz).Zone()
@@ -94,12 +96,12 @@ func (data *IpapiCom) getUTCOffset() (int, error) {
 
 func (data *IpapiCom) getASN() (string, error) {
 	if !strings.HasPrefix(data.AS, "AS") {
-		return "", errors.New("API error")
+		return "", errors.New("AS format error")
 	}
 
 	before, _, found := strings.Cut(data.AS, " ")
 	if !found {
-		return "", errors.New("API error")
+		return "", errors.New("AS format error")
 	}
 
 	return before, nil
