@@ -1,5 +1,14 @@
 # IPAPI-Agent API Reference
 
+## General Response Type
+
+Generally, both `success` or `failure` status will response as *HTTP 200 OK*.\
+But in some case, the server also will response *400 Bad Request* or *500 Internal Server Error* without JSON body.
+
+## GET `/query`
+
+Same as below, but request your client IP address.
+
 ## GET `/query/<IP addr or domain>`
 
 Response JSON:
@@ -23,3 +32,5 @@ Query strings:
 |Name|Description|Example|Value Range|
 |--|--|--|--|
 |cache|Force control whether the server uses its cache|`cache=false`|`true` or `false`|
+
+> Note: Requesting a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).

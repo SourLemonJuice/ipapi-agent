@@ -134,7 +134,7 @@ func addrToIP(addr string) (string, net.IP, error) {
 	return ips[0], ip, nil
 }
 
-// Check if the given IP is one of loopback, private, unspecified(0.0.0.0), or not global unicast address.
+// Check if the given IP is one of loopback, private, unspecified(0.0.0.0), or any non-global unicast address.
 func isSpecialIP(ip net.IP) bool {
 	if ip.IsLoopback() || ip.IsPrivate() || ip.IsUnspecified() || !ip.IsGlobalUnicast() {
 		return true
