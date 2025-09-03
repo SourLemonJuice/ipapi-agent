@@ -5,9 +5,10 @@
 Generally, both `success` or `failure` status will response as *HTTP 200 OK*.\
 But in some case, the server also will response *400 Bad Request* or *500 Internal Server Error* without JSON body.
 
-## GET `/query`
+## GET `/`
 
-Same as below, but request your client IP address.
+Respond with plain text in a human-friendly format.\
+The meaning of the entries is same as [`/query/<IP addr or domain>`](#get-queryip-addr-or-domain)
 
 ## GET `/query/<IP addr or domain>`
 
@@ -34,3 +35,7 @@ Query strings:
 |cache|Force control whether the server uses its cache|`cache=false`|`true` or `false`|
 
 > Note: Requesting a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).
+
+## GET `/query`
+
+Same as above, but request your client IP address.
