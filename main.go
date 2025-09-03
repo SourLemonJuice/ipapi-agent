@@ -39,8 +39,7 @@ func getRoot(c *gin.Context) {
 	// Also, don't forget the last line break at the body end.
 	var err error
 
-	// query := c.ClientIP() // TODO
-	query := "1.1.1.1"
+	query := c.ClientIP()
 	addrStr, addrIP, err := addrToIP(query)
 	if err != nil {
 		c.Abort()
@@ -48,13 +47,11 @@ func getRoot(c *gin.Context) {
 		return
 	}
 
-	// TODO restore it
-	// if isSpecialIP(addrIP) {
-	// 	c.Abort()
-	// 	c.String(http.StatusOK, "FAILURE\r\nYou IP address is special\r\n")
-	// 	return
-	// }
-	fmt.Println(addrStr, addrIP)
+	if isSpecialIP(addrIP) {
+		c.Abort()
+		c.String(http.StatusOK, "FAILURE\r\nYou IP address is special\r\n")
+		return
+	}
 
 	useCache, err := strconv.ParseBool(c.DefaultQuery("cache", "true"))
 	if err != nil {
