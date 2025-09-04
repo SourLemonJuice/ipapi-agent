@@ -35,7 +35,7 @@ func main() {
 }
 
 func getRoot(c *gin.Context) {
-	// Please use \r\n (CRLF) as line break symbol in this function, which it is Windows and HTTP format.
+	// Use \r\n (CRLF) as line break symbol in this function, which it is Windows and HTTP format.
 	// Also, don't forget the last line break at the body end.
 	var err error
 
@@ -43,20 +43,20 @@ func getRoot(c *gin.Context) {
 	addrStr, addrIP, err := addrToIP(query)
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusOK, "FAILURE\r\nCan not parse you IP address\r\n")
+		c.String(http.StatusOK, "FAILURE\r\nBad query IP address/domain\r\n")
 		return
 	}
 
 	if isSpecialIP(addrIP) {
 		c.Abort()
-		c.String(http.StatusOK, "FAILURE\r\nYou IP address is special\r\n")
+		c.String(http.StatusOK, "FAILURE\r\nIP address/domain is in invalid range\r\n")
 		return
 	}
 
 	useCache, err := strconv.ParseBool(c.DefaultQuery("cache", "true"))
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusBadRequest, "HTTP 400 Bad Request\r\n")
+		c.String(http.StatusBadRequest, "HTTP 400 Bad Request\r\n") // display for human
 		return
 	}
 
@@ -71,15 +71,7 @@ func getRoot(c *gin.Context) {
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusOK, "FAILURE\r\nData source requesting error: %w\r\n", err)
-		return
-	}
-
-	if apidata.IsSuccess() {
-		resp.Status = "success"
-	} else {
-		c.Abort()
-		c.String(http.StatusOK, "FAILURE\r\nData source response error: %v\r\n", apidata.GetMessage())
+		c.String(http.StatusOK, "FAILURE\r\nRequest failure: %w\r\n", err)
 		return
 	}
 
@@ -131,7 +123,7 @@ func getQuery(c *gin.Context) {
 	if isSpecialIP(addrIP) {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"status":  "failure",
-			"message": "Query IP address/domain is special",
+			"message": "IP address/domain is in invalid range",
 		})
 		return
 	}
@@ -155,17 +147,7 @@ func getQuery(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"status":  "failure",
-			"message": "Data source requesting error: " + err.Error(),
-		})
-		return
-	}
-
-	if apidata.IsSuccess() {
-		resp.Status = "success"
-	} else {
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
-			"status":  "failure",
-			"message": "Data source response error: " + apidata.GetMessage(),
+			"message": "Request failure: " + err.Error(),
 		})
 		return
 	}

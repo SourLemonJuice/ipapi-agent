@@ -23,12 +23,13 @@ type IpapiCom struct {
 	AS          string `json:"as"`
 }
 
+// If failure, response OK with JSON message
 func (data *IpapiCom) DoRequest(addr string) error {
 	var err error
 
 	resp, err := http.Get("http://ip-api.com/json/" + addr + "?fields=53003")
 	if err != nil {
-		return fmt.Errorf("API error: %w", err)
+		return fmt.Errorf("HTTP client error: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -37,22 +38,16 @@ func (data *IpapiCom) DoRequest(addr string) error {
 		return fmt.Errorf("JSON parsing error: %w", err)
 	}
 
-	return nil
-}
-
-// If failure, response OK with JSON message
-func (data *IpapiCom) IsSuccess() bool {
 	switch data.Status {
 	case "success":
-		return true
 	case "fail":
-		return false
+		return fmt.Errorf("data source response error: %v", data.Message)
+	default:
+		// for security considered, the undefined status shouldn't be returned
+		return errors.New("unknown data source response status")
 	}
-	return false
-}
 
-func (data *IpapiCom) GetMessage() string {
-	return data.Message
+	return nil
 }
 
 // If failure, response InternalServerError
