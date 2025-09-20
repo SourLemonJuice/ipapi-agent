@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -43,13 +44,13 @@ func getRoot(c *gin.Context) {
 	addrStr, addrIP, err := addrToIP(query)
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusOK, "FAILURE\r\nBad query IP address/domain\r\n")
+		c.String(http.StatusOK, "[FAILURE]\r\nBad query IP address/domain\r\n")
 		return
 	}
 
 	if isSpecialIP(addrIP) {
 		c.Abort()
-		c.String(http.StatusOK, "FAILURE\r\nIP address/domain is in invalid range\r\n")
+		c.String(http.StatusOK, "[FAILURE]\r\nIP address/domain is in invalid range\r\n")
 		return
 	}
 
@@ -63,7 +64,7 @@ func getRoot(c *gin.Context) {
 	var resp respstruct.Query
 	if val, found := queryCache.Get(addrStr); found && useCache {
 		resp = val.(respstruct.Query)
-		c.String(http.StatusOK, respTXT(resp))
+		c.String(http.StatusOK, respTXT(addrStr, resp))
 		return
 	}
 
@@ -71,7 +72,7 @@ func getRoot(c *gin.Context) {
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusOK, "FAILURE\r\nRequest failure: %w\r\n", err)
+		c.String(http.StatusOK, "[FAILURE]\r\nRequest failure: %w\r\n", err)
 		return
 	}
 
@@ -83,24 +84,24 @@ func getRoot(c *gin.Context) {
 
 	queryCache.SetDefault(addrStr, resp)
 
-	c.String(http.StatusOK, respTXT(resp))
+	c.String(http.StatusOK, respTXT(addrStr, resp))
 }
 
-func respTXT(resp respstruct.Query) string {
-	var txt string
+func respTXT(ipStr string, resp respstruct.Query) string {
+	var txt strings.Builder
 
-	txt += strings.ToUpper(resp.Status) + "\r\n"
-	txt += "Data Source:\t" + resp.DataSource + "\r\n"
-	txt += "Country:\t" + resp.Country + "\r\n"
-	txt += "Country Code:\t" + resp.CountryCode + "\r\n"
-	txt += "Region:\t\t" + resp.Region + "\r\n"
-	txt += "Timezone:\t" + resp.Timezone + "\r\n"
-	txt += "UTC Offset(min):\t" + strconv.FormatInt(int64(resp.UTCOffset), 10) + "\r\n"
-	txt += "ISP:\t\t" + resp.ISP + "\r\n"
-	txt += "Organization:\t" + resp.Org + "\r\n"
-	txt += "ASN:\t\t" + resp.ASN + "\r\n"
+	// U+25CF Black Circle: ●
+	txt.WriteString(fmt.Sprintf("\u25cf %v | %v\r\n", ipStr, resp.DataSource))
 
-	return txt
+	tab := tabwriter.NewWriter(&txt, 0, 0, 1, ' ', tabwriter.AlignRight)
+	fmt.Fprintf(tab, "Location: \t%v, %v (%v)\r\n", resp.Region, resp.Country, resp.CountryCode)
+	fmt.Fprintf(tab, "Timezone: \t%v %v\r\n", resp.Timezone, utcMinToISO8601(resp.UTCOffset))
+	fmt.Fprintf(tab, "ISP: \t%v\r\n", resp.ISP)
+	fmt.Fprintf(tab, "Org: \t%v\r\n", resp.Org)
+	fmt.Fprintf(tab, "ASN: \t%v\r\n", resp.ASN)
+	tab.Flush()
+
+	return txt.String()
 }
 
 func getQuery(c *gin.Context) {
@@ -195,4 +196,23 @@ func isSpecialIP(ip net.IP) bool {
 		return true
 	}
 	return false
+}
+
+func utcMinToISO8601(min int) string {
+	var out strings.Builder
+
+	out.WriteString("UTC")
+	if min == 0 {
+		out.WriteString("0")
+		return out.String()
+	} else if min > 0 {
+		out.WriteString("+")
+	} else if min < 0 {
+		out.WriteString("-")
+		min = -min // our AbsInt() :]
+	}
+
+	out.WriteString(fmt.Sprintf("%02d", min/60))
+	out.WriteString(fmt.Sprintf("%02d", min%60))
+	return out.String()
 }
