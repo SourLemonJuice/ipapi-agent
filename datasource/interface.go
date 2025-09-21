@@ -1,8 +1,8 @@
 package datasource
 
-import "github.com/SourLemonJuice/ipapi-agent/respstruct"
+import "github.com/SourLemonJuice/ipapi-agent/resps"
 
 type Interface interface {
 	DoRequest(addr string) error
-	Fill(resp *respstruct.Query) error
+	Fill(resp *resps.Query) error
 }

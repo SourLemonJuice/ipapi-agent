@@ -16,7 +16,7 @@ import (
 	"github.com/patrickmn/go-cache"
 
 	"github.com/SourLemonJuice/ipapi-agent/datasource"
-	"github.com/SourLemonJuice/ipapi-agent/respstruct"
+	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
 
 var conf config
@@ -27,11 +27,12 @@ func main() {
 
 	log.SetPrefix("ipapi-agent: ")
 	log.SetFlags(0)
-	log.Print("initializing...")
 
 	var confPath string
 	flag.StringVar(&confPath, "config", "", "config file path")
 	flag.Parse()
+
+	log.Print("initializing...")
 
 	conf = newConfig()
 	if len(confPath) == 0 {
@@ -98,9 +99,9 @@ func getRoot(c *gin.Context) {
 		return
 	}
 
-	var resp respstruct.Query
+	var resp resps.Query
 	if val, found := queryCache.Get(addrStr); found && useCache {
-		resp = val.(respstruct.Query)
+		resp = val.(resps.Query)
 		c.String(http.StatusOK, respTXT(addrStr, resp))
 		return
 	}
@@ -124,7 +125,7 @@ func getRoot(c *gin.Context) {
 	c.String(http.StatusOK, respTXT(addrStr, resp))
 }
 
-func respTXT(ipStr string, resp respstruct.Query) string {
+func respTXT(ipStr string, resp resps.Query) string {
 	var txt strings.Builder
 
 	// U+25CF Black Circle: ●
@@ -172,13 +173,15 @@ func getQuery(c *gin.Context) {
 		return
 	}
 
-	var resp respstruct.Query
+	var resp resps.Query
 	// love cache ^_^
 	if val, found := queryCache.Get(addrStr); found && useCache {
-		resp = val.(respstruct.Query)
+		resp = val.(resps.Query)
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+
+	resp.Status = "success"
 
 	var apidata datasource.Interface = &datasource.IpapiCom{}
 	err = apidata.DoRequest(addrStr)

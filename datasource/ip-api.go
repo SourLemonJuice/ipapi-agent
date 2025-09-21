@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SourLemonJuice/ipapi-agent/respstruct"
+	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
 
 type IpapiCom struct {
@@ -51,7 +51,7 @@ func (data *IpapiCom) DoRequest(addr string) error {
 }
 
 // If failure, response InternalServerError
-func (data *IpapiCom) Fill(resp *respstruct.Query) error {
+func (data *IpapiCom) Fill(resp *resps.Query) error {
 	var err error
 
 	resp.DataSource = "ip-api.com"
