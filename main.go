@@ -108,6 +108,8 @@ func getRoot(c *gin.Context) {
 		return
 	}
 
+	resp.Status = "success"
+
 	var apidata datasource.Interface = &datasource.IpapiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
@@ -239,6 +241,7 @@ func queryToIP(query string) (string, net.IP, error) {
 
 // Check if the given IP is one of loopback, private, unspecified(0.0.0.0), or any non-global unicast address.
 func isSpecialIP(ip net.IP) bool {
+	// TODO
 	if ip.IsLoopback() || ip.IsPrivate() || ip.IsUnspecified() || !ip.IsGlobalUnicast() {
 		return true
 	}

@@ -13,7 +13,7 @@ import (
 
 type IpapiCom struct {
 	Status      string `json:"status"`
-	Message     string `json:"message,omitempty"`
+	Message     string `json:"message"`
 	Country     string `json:"country"`
 	CountryCode string `json:"countryCode"`
 	RegionName  string `json:"regionName"`
@@ -23,11 +23,10 @@ type IpapiCom struct {
 	AS          string `json:"as"`
 }
 
-// If failure, response OK with JSON message
 func (data *IpapiCom) DoRequest(addr string) error {
 	var err error
 
-	resp, err := http.Get("http://ip-api.com/json/" + addr + "?fields=53003")
+	resp, err := http.Get(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr))
 	if err != nil {
 		return fmt.Errorf("HTTP client error: %w", err)
 	}
@@ -50,7 +49,6 @@ func (data *IpapiCom) DoRequest(addr string) error {
 	return nil
 }
 
-// If failure, response InternalServerError
 func (data *IpapiCom) Fill(resp *resps.Query) error {
 	var err error
 
