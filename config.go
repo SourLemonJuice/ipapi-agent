@@ -15,8 +15,9 @@ type config struct {
 }
 
 type configDev struct {
-	Debug bool `toml:"debug"`
-	Log   bool `toml:"log"`
+	Debug        bool     `toml:"debug"`
+	Log          bool     `toml:"log"`
+	TLDBlockList []string `toml:"tld_blocklist"`
 }
 
 func newConfig() config {
@@ -26,8 +27,9 @@ func newConfig() config {
 		ResolveDomain:  true,
 		TrustedProxies: []string{"127.0.0.1", "::1"},
 		Dev: configDev{
-			Debug: false,
-			Log:   false,
+			Debug:        false,
+			Log:          false,
+			TLDBlockList: nil,
 		},
 	}
 }

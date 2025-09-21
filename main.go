@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/netip"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -81,14 +82,14 @@ func getRoot(c *gin.Context) {
 	var err error
 
 	query := c.ClientIP()
-	addrStr, addrIP, err := queryToIP(query)
+	addrStr, addrIP, err := queryToAddr(query)
 	if err != nil {
 		c.Abort()
 		c.String(http.StatusOK, "[FAILURE]\r\nBad query IP address/domain\r\n")
 		return
 	}
 
-	if isSpecialIP(addrIP) {
+	if isSpecialAddr(addrIP) {
 		c.Abort()
 		c.String(http.StatusOK, "[FAILURE]\r\nIP address/domain is in invalid range\r\n")
 		return
@@ -154,7 +155,7 @@ func getQuery(c *gin.Context) {
 		query = c.ClientIP()
 	}
 
-	addrStr, addrIP, err := queryToIP(query)
+	addrStr, addrIP, err := queryToAddr(query)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"status":  "failure",
@@ -163,7 +164,7 @@ func getQuery(c *gin.Context) {
 		return
 	}
 
-	if isSpecialIP(addrIP) {
+	if isSpecialAddr(addrIP) {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"status":  "failure",
 			"message": "IP address/domain is in invalid range",
@@ -210,39 +211,60 @@ func getQuery(c *gin.Context) {
 
 // Convert query string that can contain IP address and domain into one safe IP address format.
 // Result won't be: empty string, invalid IP, unresolvable domain.
-func queryToIP(query string) (string, net.IP, error) {
+func queryToAddr(query string) (string, netip.Addr, error) {
+	var err error
+
 	if query == "" {
-		// string can be nil
-		return "", nil, errors.New("empty IP/domain")
+		return "", netip.Addr{}, errors.New("empty IP/domain")
 	}
 
 	// query is a real IP address
-	ip := net.ParseIP(query)
-	if ip != nil {
-		return query, ip, nil
+	addr, err := netip.ParseAddr(query)
+	if err == nil {
+		return query, addr, nil
 	}
 
 	// should we continue parsing?
 	if !conf.ResolveDomain {
-		return "", nil, errors.New("not permitted to resolve domain")
+		return "", netip.Addr{}, errors.New("not permitted to resolve domain")
 	}
 
 	// query is a domain name
-	ipStrArr, err := net.LookupHost(query)
+	addr, err = resolveDomain(query)
 	if err != nil {
-		return "", nil, fmt.Errorf("lookup addr as domain failure: %w", err)
+		return "", netip.Addr{}, err
 	}
-	ip = net.ParseIP(ipStrArr[0])
-	if ip == nil {
-		return "", nil, errors.New("invalid domain IP address")
+	return query, addr, nil
+}
+
+func resolveDomain(domain string) (netip.Addr, error) {
+	if !strings.Contains(domain, ".") {
+		return netip.Addr{}, errors.New("invalid domain")
 	}
-	return ipStrArr[0], ip, nil
+	// you may want to block .lan TLD with config file, because that's not a part of any standard
+	reservedTLD := []string{".example", ".invalid", ".localhost", ".test", ".local", ".onion", ".internal", ".alt"}
+	reservedTLD = append(reservedTLD, conf.Dev.TLDBlockList...)
+	for _, tld := range reservedTLD {
+		if strings.HasSuffix(domain, tld) {
+			return netip.Addr{}, errors.New("invalid domain")
+		}
+	}
+
+	addrStrArr, err := net.LookupHost(domain)
+	if err != nil {
+		return netip.Addr{}, fmt.Errorf("lookup domain failure: %w", err)
+	}
+	addr, err := netip.ParseAddr(addrStrArr[0])
+	if err != nil {
+		return netip.Addr{}, fmt.Errorf("invalid domain IP address: %w", err)
+	}
+
+	return addr, nil
 }
 
 // Check if the given IP is one of loopback, private, unspecified(0.0.0.0), or any non-global unicast address.
-func isSpecialIP(ip net.IP) bool {
-	// TODO
-	if ip.IsLoopback() || ip.IsPrivate() || ip.IsUnspecified() || !ip.IsGlobalUnicast() {
+func isSpecialAddr(addr netip.Addr) bool {
+	if addr.IsLoopback() || addr.IsPrivate() || addr.IsUnspecified() || !addr.IsGlobalUnicast() {
 		return true
 	}
 	return false
