@@ -1,3 +1,3 @@
-# IPAPI-Agent
+# IPAPI-agent
 
 Reverse proxy public IP data API info.

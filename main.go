@@ -2,7 +2,9 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"strconv"
@@ -17,14 +19,44 @@ import (
 	"github.com/SourLemonJuice/ipapi-agent/respstruct"
 )
 
+var conf config
 var queryCache *cache.Cache
 
 func main() {
+	var err error
+
+	log.SetPrefix("ipapi-agent: ")
+	log.SetFlags(0)
+	log.Print("initializing...")
+
+	var confPath string
+	flag.StringVar(&confPath, "config", "", "config file path")
+	flag.Parse()
+
+	conf = newConfig()
+	if len(confPath) == 0 {
+		log.Print("no config file provided")
+	} else {
+		log.Printf("loading config file %v", confPath)
+		err = conf.decodeFile(confPath)
+		if err != nil {
+			log.Fatalf("can't load config file: %v", err)
+		}
+	}
+
+	if conf.Dev.Debug {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.New()
 	router.RedirectTrailingSlash = true
 	router.RemoveExtraSlash = true
 	router.Use(gin.Recovery())
-	router.Use(gin.Logger())
+	if conf.Dev.Log {
+		router.Use(gin.Logger())
+	}
 
 	router.GET("/", getRoot)
 	router.GET("/query", getQuery)
@@ -32,7 +64,12 @@ func main() {
 
 	queryCache = cache.New(6*time.Hour, 30*time.Minute)
 
-	router.Run(":8080")
+	serverAddr := net.JoinHostPort(conf.Listen, strconv.FormatUint(uint64(conf.ListenPort), 10))
+	log.Printf("starting server on %v", serverAddr)
+	err = router.Run(serverAddr)
+	if err != nil {
+		log.Fatalf("server(gin) error: %v", err)
+	}
 }
 
 func getRoot(c *gin.Context) {
@@ -41,7 +78,7 @@ func getRoot(c *gin.Context) {
 	var err error
 
 	query := c.ClientIP()
-	addrStr, addrIP, err := addrToIP(query)
+	addrStr, addrIP, err := queryToIP(query)
 	if err != nil {
 		c.Abort()
 		c.String(http.StatusOK, "[FAILURE]\r\nBad query IP address/domain\r\n")
@@ -112,7 +149,7 @@ func getQuery(c *gin.Context) {
 		query = c.ClientIP()
 	}
 
-	addrStr, addrIP, err := addrToIP(query)
+	addrStr, addrIP, err := queryToIP(query)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"status":  "failure",
@@ -166,7 +203,7 @@ func getQuery(c *gin.Context) {
 
 // Convert query string that can contain IP address and domain into one safe IP address format.
 // Result won't be: empty string, invalid IP, unresolvable domain.
-func addrToIP(query string) (string, net.IP, error) {
+func queryToIP(query string) (string, net.IP, error) {
 	if query == "" {
 		// string can be nil
 		return "", nil, errors.New("empty IP/domain")
@@ -176,6 +213,11 @@ func addrToIP(query string) (string, net.IP, error) {
 	ip := net.ParseIP(query)
 	if ip != nil {
 		return query, ip, nil
+	}
+
+	// should we continue parsing?
+	if !conf.ResolveDomain {
+		return "", nil, errors.New("not permitted to resolve domain")
 	}
 
 	// query is a domain name

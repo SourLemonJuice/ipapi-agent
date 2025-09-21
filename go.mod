@@ -3,6 +3,7 @@ module github.com/SourLemonJuice/ipapi-agent
 go 1.24.6
 
 require (
+	github.com/BurntSushi/toml v1.5.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 )
