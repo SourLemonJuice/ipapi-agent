@@ -23,11 +23,15 @@ import (
 var conf config
 var queryCache *cache.Cache
 
-func main() {
-	var err error
-
+func init() {
 	log.SetPrefix("ipapi-agent: ")
 	log.SetFlags(0)
+
+	queryCache = cache.New(6*time.Hour, 30*time.Minute)
+}
+
+func main() {
+	var err error
 
 	var confPath string
 	flag.StringVar(&confPath, "config", "", "config file path")
@@ -36,6 +40,7 @@ func main() {
 	log.Print("initializing...")
 
 	conf = newConfig()
+	// if the path is empty, only default value will be applied.
 	if len(confPath) == 0 {
 		log.Print("no config file provided")
 	} else {
@@ -65,8 +70,6 @@ func main() {
 	router.GET("/", getRoot)
 	router.GET("/query", getQuery)
 	router.GET("/query/:addr", getQuery)
-
-	queryCache = cache.New(6*time.Hour, 30*time.Minute)
 
 	serverAddr := net.JoinHostPort(conf.Listen, strconv.FormatUint(uint64(conf.ListenPort), 10))
 	log.Printf("starting server on %v", serverAddr)
@@ -274,12 +277,13 @@ func utcMinToISO8601(min int) string {
 	var out strings.Builder
 
 	out.WriteString("UTC")
-	if min == 0 {
+	switch {
+	case min == 0:
 		out.WriteString("0")
 		return out.String()
-	} else if min > 0 {
+	case min > 0:
 		out.WriteString("+")
-	} else if min < 0 {
+	case min < 0:
 		out.WriteString("-")
 		min = -min // our AbsInt() :]
 	}
