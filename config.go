@@ -7,10 +7,11 @@ import (
 )
 
 type config struct {
-	Listen        string    `toml:"listen"`
-	ListenPort    uint16    `toml:"listen_port"`
-	ResolveDomain bool      `toml:"resolve_domain"`
-	Dev           configDev `toml:"dev"`
+	Listen         string    `toml:"listen"`
+	ListenPort     uint16    `toml:"listen_port"`
+	ResolveDomain  bool      `toml:"resolve_domain"`
+	TrustedProxies []string  `toml:"trusted_proxies"`
+	Dev            configDev `toml:"dev"`
 }
 
 type configDev struct {
@@ -20,9 +21,10 @@ type configDev struct {
 
 func newConfig() config {
 	return config{
-		Listen:        "::",
-		ListenPort:    8080,
-		ResolveDomain: true,
+		Listen:         "::",
+		ListenPort:     8080,
+		ResolveDomain:  true,
+		TrustedProxies: []string{"127.0.0.1", "::1"},
 		Dev: configDev{
 			Debug: false,
 			Log:   false,

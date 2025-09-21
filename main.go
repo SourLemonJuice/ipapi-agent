@@ -59,6 +59,8 @@ func main() {
 		router.Use(gin.Logger())
 	}
 
+	router.SetTrustedProxies(conf.TrustedProxies)
+
 	router.GET("/", getRoot)
 	router.GET("/query", getQuery)
 	router.GET("/query/:addr", getQuery)
