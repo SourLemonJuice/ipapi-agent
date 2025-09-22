@@ -1,0 +1,10 @@
+listen = "::"
+listen_port = 8080
+resolve_domain = true
+trusted_proxies = ["127.0.0.1", "::1"]
+
+# unstable entries
+# [dev]
+# debug = false
+# log = false
+# tld_blocklist = []

@@ -53,8 +53,15 @@ Query strings:
 |--|--|--|--|
 |cache|Force control whether the server uses its cache|`cache=false`|`true` or `false`|
 
-> Note: Requesting a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).\
-> Also, if you are querying a reserved domain, it will also return an error.
+> Note: Request a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).\
+> Even though, many reserved addresses(CIDR) are still not filtered.
+
+If you are querying a reserved domain, it will also return an error. You can extend this list in config file.\
+Current list: `".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"`\
+Source: [Special-use domain name - Wikipedia](https://en.wikipedia.org/wiki/Special-use_domain_name)
+
+Consider that some DNS servers will respond with a geolocation-related IP address to reduce CDN's loading time.\
+If you still feel resolving a domain is dangerous, you can set `resolve_domain = false` in config file to protect your server location securely.
 
 ## GET `/query`
 

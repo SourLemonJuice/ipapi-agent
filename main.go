@@ -253,10 +253,11 @@ func resolveDomain(domain string) (netip.Addr, error) {
 	if !strings.Contains(domain, ".") {
 		return netip.Addr{}, errors.New("invalid domain")
 	}
+	// block some reserved TLDs
 	// you may want to block .lan TLD with config file, because that's not a part of any standard
-	reservedTLD := []string{".example", ".invalid", ".localhost", ".test", ".local", ".onion", ".internal", ".alt"}
-	reservedTLD = append(reservedTLD, conf.Dev.TLDBlockList...)
-	for _, tld := range reservedTLD {
+	blockedTLD := []string{".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"}
+	blockedTLD = append(blockedTLD, conf.Dev.TLDBlockList...)
+	for _, tld := range blockedTLD {
 		if strings.HasSuffix(domain, tld) {
 			return netip.Addr{}, errors.New("invalid domain")
 		}
