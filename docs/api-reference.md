@@ -1,14 +1,33 @@
-# IPAPI-Agent API Reference
-
-## General Response Type
-
-Generally, both `success` or `failure` status will response as *HTTP 200 OK*.\
-But in some case, the server also will response *400 Bad Request* or *500 Internal Server Error* without JSON body.
+# IPAPI-agent API Reference
 
 ## GET `/`
 
 Respond with plain text in a human-friendly format.\
-The meaning of the entries is same as [`/query/<IP addr or domain>`](#get-queryip-addr-or-domain)
+The content of the response is unclear, you should not use this endpoint in your script.
+
+The content of the response is almost a variant of [`/query/<IP addr or domain>`](#get-queryip-addr-or-domain), but queries the client IP address.\
+Its limitations also apply.
+
+This endpoint shares the query cache with [`/query/<IP addr or domain>`](#get-queryip-addr-or-domain), but can not be disabled.
+
+Example:
+
+```text
+● 1.1.1.1 | ip-api.com
+ Location: Queensland, Australia (AU)
+ Timezone: Australia/Brisbane UTC+1000
+      ISP: Cloudflare, Inc
+      Org: APNIC and Cloudflare DNS Resolver project
+      ASN: AS13335
+```
+
+Try it with curl:
+
+```shell
+curl https://ipapi.example.com
+# or request a fake client IP via X-Real-IP, as long as you are in the trusted_proxies list
+curl -H 'X-Real-IP: 1.1.1.1' localhost:8080
+```
 
 ## GET `/query/<IP addr or domain>`
 
@@ -34,7 +53,8 @@ Query strings:
 |--|--|--|--|
 |cache|Force control whether the server uses its cache|`cache=false`|`true` or `false`|
 
-> Note: Requesting a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).
+> Note: Requesting a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).\
+> Also, if you are querying a reserved domain, it will also return an error.
 
 ## GET `/query`
 

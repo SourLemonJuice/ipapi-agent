@@ -99,25 +99,18 @@ func getRoot(c *gin.Context) {
 	addrStr, addrIP, err := queryToAddr(query)
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusOK, "[FAILURE]\r\nBad query IP address/domain\r\n")
+		c.String(http.StatusBadRequest, "[FAILURE]\r\nBad query IP address/domain\r\n")
 		return
 	}
 
 	if isSpecialAddr(addrIP) {
 		c.Abort()
-		c.String(http.StatusOK, "[FAILURE]\r\nIP address/domain is in invalid range\r\n")
-		return
-	}
-
-	useCache, err := strconv.ParseBool(c.DefaultQuery("cache", "true"))
-	if err != nil {
-		c.Abort()
-		c.String(http.StatusBadRequest, "HTTP 400 Bad Request\r\n") // display for human
+		c.String(http.StatusBadRequest, "[FAILURE]\r\nIP address/domain is in invalid range\r\n")
 		return
 	}
 
 	var resp resps.Query
-	if val, found := queryCache.Get(addrStr); found && useCache {
+	if val, found := queryCache.Get(addrStr); found {
 		resp = val.(resps.Query)
 		c.String(http.StatusOK, respTXT(addrStr, resp))
 		return
@@ -129,13 +122,15 @@ func getRoot(c *gin.Context) {
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusOK, "[FAILURE]\r\nRequest failure: %w\r\n", err)
+		c.String(http.StatusInternalServerError, "[FAILURE]\r\nData source error: %w\r\n", err)
 		return
 	}
 
 	err = apidata.Fill(&resp)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		// for security reasons, it won't response error string
+		c.Abort()
+		c.String(http.StatusInternalServerError, "[FAILURE]\r\nInternal Server Error\r\n")
 		return
 	}
 
@@ -171,7 +166,7 @@ func getQuery(c *gin.Context) {
 
 	addrStr, addrIP, err := queryToAddr(query)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"status":  "failure",
 			"message": "Bad query IP address/domain: " + err.Error(),
 		})
@@ -179,7 +174,7 @@ func getQuery(c *gin.Context) {
 	}
 
 	if isSpecialAddr(addrIP) {
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"status":  "failure",
 			"message": "IP address/domain is in invalid range",
 		})
@@ -205,17 +200,19 @@ func getQuery(c *gin.Context) {
 	var apidata datasource.Interface = &datasource.IpapiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
-			"status": "failure",
-			// TODO change name
-			"message": "Request failure: " + err.Error(),
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status":  "failure",
+			"message": "Data source error: " + err.Error(),
 		})
 		return
 	}
 
 	err = apidata.Fill(&resp)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status":  "failure",
+			"message": "Internal Server Error",
+		})
 		return
 	}
 

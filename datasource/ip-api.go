@@ -28,22 +28,22 @@ func (data *IpapiCom) DoRequest(addr string) error {
 
 	resp, err := http.Get(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr))
 	if err != nil {
-		return fmt.Errorf("HTTP client error: %w", err)
+		return fmt.Errorf("HTTP request error: %w", err)
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
-		return fmt.Errorf("JSON parsing error: %w", err)
+		return fmt.Errorf("JSON parse error: %w", err)
 	}
 
 	switch data.Status {
 	case "success":
 	case "fail":
-		return fmt.Errorf("data source response error: %v", data.Message)
+		return fmt.Errorf("response error: %v", data.Message)
 	default:
 		// for security considered, the undefined status shouldn't be returned
-		return errors.New("unknown data source response status")
+		return errors.New("unknown response status")
 	}
 
 	return nil
