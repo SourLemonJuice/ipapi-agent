@@ -1,6 +1,7 @@
 # IPAPI-agent
 
-Reverse proxy public IP data API info.
+Reverse proxy public IP data API.\
+View the IP country/region and ASN in a JSON or plain text format.
 
 ## Configuration
 
@@ -51,7 +52,7 @@ Default: `trusted_proxies = ["127.0.0.1", "::1"]`
 
 ## Config [dev] section
 
-Unstable entries, must not use these configs in production.
+> Warning: UNSTABLE entries, must not use these configs in production.
 
 ### dev.debug
 

@@ -3,7 +3,7 @@
 ## GET `/`
 
 Respond with plain text in a human-friendly format.\
-The content of the response is unclear, you should not use this endpoint in your script.
+The content of the response is uncertain, you should not use this endpoint in your script.
 
 The content of the response is almost a variant of [`/query/<IP addr or domain>`](#get-queryip-addr-or-domain), but queries the client IP address.\
 Its limitations also apply.
@@ -36,7 +36,7 @@ Response JSON:
 |Name|Description|Example|Type|
 |--|--|--|--|
 |status|`success` or `failure`|`"success"`|string|
-|message|User-friendly message, **ONLY exists** when failure state. unsure content|`"Data source error"`|string|
+|message|User-friendly message, **ONLY exists** when failure state. Uncertain content|`"Data source error"`|string|
 |dataSource|One of upstream data providers: `ip-api.com`|`"ip-api.com"`|string|
 |country|Country common name|`"United Kingdom"`|string|
 |countryCode|ISO 3166 Country two-letters code|`"GB"`|string|
@@ -54,7 +54,7 @@ Query strings:
 |cache|Force control whether the server uses its cache|`cache=false`|`true` or `false`|
 
 > Note: Request a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).\
-> Even though, many reserved addresses(CIDR) are still not filtered.
+> Even though, many reserved addresses/CIDRs are still not filtered.
 
 If you are querying a reserved domain, it will also return an error. You can extend this list in config file.\
 Current list: `".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"`\
