@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/netip"
+	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -16,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/patrickmn/go-cache"
 
+	"github.com/SourLemonJuice/ipapi-agent/buildinfo"
 	"github.com/SourLemonJuice/ipapi-agent/datasource"
 	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
@@ -33,19 +35,19 @@ func init() {
 func main() {
 	var err error
 
-	var confPath string
-	flag.StringVar(&confPath, "config", "", "config file path")
+	flag.BoolFunc("version", "print version information of ipapi-agent", flagVersion)
+	confPath := flag.String("config", "", "set config file path")
 	flag.Parse()
 
 	log.Print("initializing...")
 
 	conf = newConfig()
 	// if the path is empty, only default value will be applied.
-	if len(confPath) == 0 {
+	if len(*confPath) == 0 {
 		log.Print("no config file provided")
 	} else {
-		log.Printf("loading config file %v", confPath)
-		err = conf.decodeFile(confPath)
+		log.Printf("loading config file %v", *confPath)
+		err = conf.decodeFile(*confPath)
 		if err != nil {
 			log.Fatalf("can't load config file: %v", err)
 		}
@@ -77,6 +79,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("server(gin) error: %v", err)
 	}
+}
+
+func flagVersion(s string) error {
+	fmt.Printf("ipapi-agent version %v\n\n", buildinfo.Version)
+
+	fmt.Printf("Environment: %v %v/%v\n", buildinfo.GoVersion, buildinfo.OS, buildinfo.Arch)
+
+	os.Exit(0)
+	return nil
 }
 
 func getRoot(c *gin.Context) {
@@ -195,7 +206,8 @@ func getQuery(c *gin.Context) {
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
-			"status":  "failure",
+			"status": "failure",
+			// TODO change name
 			"message": "Request failure: " + err.Error(),
 		})
 		return
