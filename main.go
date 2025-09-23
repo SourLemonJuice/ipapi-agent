@@ -121,6 +121,7 @@ func getRoot(c *gin.Context) {
 	var apidata datasource.Interface = &datasource.IpapiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
+		log.Printf("Data source error: %v", err)
 		c.Abort()
 		c.String(http.StatusInternalServerError, "[FAILURE]\r\nData source error: %w\r\n", err)
 		return
@@ -128,7 +129,7 @@ func getRoot(c *gin.Context) {
 
 	err = apidata.Fill(&resp)
 	if err != nil {
-		// for security reasons, it won't response error string
+		log.Printf("Internal Server Error: %v", err)
 		c.Abort()
 		c.String(http.StatusInternalServerError, "[FAILURE]\r\nInternal Server Error\r\n")
 		return
@@ -200,6 +201,7 @@ func getQuery(c *gin.Context) {
 	var apidata datasource.Interface = &datasource.IpapiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
+		log.Printf("Data source error: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status":  "failure",
 			"message": "Data source error: " + err.Error(),
@@ -209,6 +211,8 @@ func getQuery(c *gin.Context) {
 
 	err = apidata.Fill(&resp)
 	if err != nil {
+		log.Printf("Internal Server Error: %v", err)
+		// for security reasons, it won't response error string
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status":  "failure",
 			"message": "Internal Server Error",
