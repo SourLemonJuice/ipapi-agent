@@ -10,7 +10,7 @@ Its limitations also apply.
 
 This endpoint shares the query cache with [`/query/<IP addr or domain>`](#get-queryip-addr-or-domain), but can not be disabled.
 
-Example:
+For example:
 
 ```text
 ● 1.1.1.1 | ip-api.com
@@ -21,6 +21,13 @@ Example:
       ASN: AS13335
 ```
 
+Or this:
+
+```text
+× FAILURE
+IP address/domain is in invalid range
+```
+
 Try it with curl:
 
 ```shell
@@ -28,6 +35,9 @@ curl https://ipapi.example.com
 # or request a fake client IP via X-Real-IP, as long as you are in the trusted_proxies list
 curl -H 'X-Real-IP: 1.1.1.1' localhost:8080
 ```
+
+After v0.2.0, if the user agent of the client is `curl`, some ANSI color codes will be added. awa\
+I copied those ideas from systemd, haha.
 
 ## GET `/query/<IP addr or domain>`
 

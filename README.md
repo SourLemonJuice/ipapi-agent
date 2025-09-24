@@ -3,6 +3,16 @@
 Reverse proxy public IP data API.\
 View the IP country/region and ASN in a JSON or plain text format.
 
+## Usage/API Reference
+
+Try our human interface via curl:
+
+```shell
+curl https://ipapi-agent.example.com
+```
+
+Or check out the full REST api reference(include details of the human interface): [docs/api-reference.md](docs/api-reference.md)
+
 ## Configuration
 
 IPAPI-agent use TOML as the config file format. It'll automatically find `ipapi-agent.toml` file in the same directory, or you can specific the config file path via the command line flag:
