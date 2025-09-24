@@ -25,4 +25,4 @@ go.work.sum
 .env
 
 /ipapi-agent
-/config.toml
+/*.toml

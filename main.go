@@ -26,7 +26,7 @@ var conf config
 var queryCache *cache.Cache
 
 func init() {
-	log.SetPrefix("ipapi-agent: ")
+	log.SetPrefix("[ipapi-agent] ")
 	log.SetFlags(0)
 
 	queryCache = cache.New(6*time.Hour, 30*time.Minute)
@@ -42,9 +42,16 @@ func main() {
 	log.Print("initializing...")
 
 	conf = newConfig()
-	// if the path is empty, only default value will be applied.
 	if len(*confPath) == 0 {
-		log.Print("no config file provided")
+		_, err = os.Stat("ipapi-agent.toml")
+		if !os.IsNotExist(err) {
+			*confPath = "ipapi-agent.toml"
+			log.Printf("found default config file %v", *confPath)
+		}
+	}
+	// if no any file found, only default value will be applied.
+	if len(*confPath) == 0 {
+		log.Print("no config file provided, use defaults")
 	} else {
 		log.Printf("loading config file %v", *confPath)
 		err = conf.decodeFile(*confPath)

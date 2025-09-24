@@ -5,10 +5,10 @@ View the IP country/region and ASN in a JSON or plain text format.
 
 ## Configuration
 
-IPAPI-agent use TOML as the config file format. You can specific the config file path via command line flag:
+IPAPI-agent use TOML as the config file format. It'll automatically find `ipapi-agent.toml` file in the same directory, or you can specific the config file path via the command line flag:
 
 ```shell
-ipapi-agent --config ./config.toml
+ipapi-agent --config ./ipapi-agent.toml
 ```
 
 Typically, your config may look like this:
