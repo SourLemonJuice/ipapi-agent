@@ -15,6 +15,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	"github.com/patrickmn/go-cache"
 
@@ -117,10 +118,15 @@ func getRoot(c *gin.Context) {
 		return
 	}
 
+	colorful := false
+	if strings.HasPrefix(c.GetHeader("User-Agent"), "curl") {
+		colorful = true
+	}
+
 	var resp resps.Query
 	if val, found := queryCache.Get(addrStr); found {
 		resp = val.(resps.Query)
-		c.String(http.StatusOK, respTXT(addrStr, resp))
+		c.String(http.StatusOK, respTXT(addrStr, resp, colorful))
 		return
 	}
 
@@ -145,16 +151,19 @@ func getRoot(c *gin.Context) {
 
 	queryCache.SetDefault(addrStr, resp)
 
-	c.String(http.StatusOK, respTXT(addrStr, resp))
+	c.String(http.StatusOK, respTXT(addrStr, resp, colorful))
 }
 
-func respTXT(ipStr string, resp resps.Query) string {
+func respTXT(addrStr string, resp resps.Query, colorful bool) string {
 	var txt strings.Builder
+	cGreen := color.New(color.FgHiGreen)
 
 	// U+25CF Black Circle: ●
-	txt.WriteString(fmt.Sprintf("\u25cf %v | %v\r\n", ipStr, resp.DataSource))
+	// from systemctl status ^_^
+	txt.WriteString(cGreen.Sprint("\u25cf"))
+	txt.WriteString(fmt.Sprintf(" %v - %v\r\n", addrStr, resp.DataSource))
 
-	tab := tabwriter.NewWriter(&txt, 0, 0, 1, ' ', tabwriter.AlignRight)
+	tab := tabwriter.NewWriter(&txt, 0, 0, 0, ' ', tabwriter.AlignRight)
 	fmt.Fprintf(tab, "Location: \t%v, %v (%v)\r\n", resp.Region, resp.Country, resp.CountryCode)
 	fmt.Fprintf(tab, "Timezone: \t%v %v\r\n", resp.Timezone, utcMinToISO8601(resp.UTCOffset))
 	fmt.Fprintf(tab, "ISP: \t%v\r\n", resp.ISP)
