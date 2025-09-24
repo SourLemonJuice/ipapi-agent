@@ -108,13 +108,13 @@ func getRoot(c *gin.Context) {
 	addrStr, addrIP, err := queryToAddr(query)
 	if err != nil {
 		c.Abort()
-		c.String(http.StatusBadRequest, "[FAILURE]\r\nBad query IP address/domain\r\n")
+		c.String(http.StatusBadRequest, respTXTFailure("Bad query IP address/domain"))
 		return
 	}
 
 	if isSpecialAddr(addrIP) {
 		c.Abort()
-		c.String(http.StatusBadRequest, "[FAILURE]\r\nIP address/domain is in invalid range\r\n")
+		c.String(http.StatusBadRequest, respTXTFailure("IP address/domain is in invalid range"))
 		return
 	}
 
@@ -137,7 +137,7 @@ func getRoot(c *gin.Context) {
 	if err != nil {
 		log.Printf("Data source error: %v", err)
 		c.Abort()
-		c.String(http.StatusInternalServerError, "[FAILURE]\r\nData source error: %w\r\n", err)
+		c.String(http.StatusInternalServerError, respTXTFailure("Data source error: %v", err))
 		return
 	}
 
@@ -145,13 +145,26 @@ func getRoot(c *gin.Context) {
 	if err != nil {
 		log.Printf("Internal Server Error: %v", err)
 		c.Abort()
-		c.String(http.StatusInternalServerError, "[FAILURE]\r\nInternal Server Error\r\n")
+		c.String(http.StatusInternalServerError, respTXTFailure("Internal Server Error"))
 		return
 	}
 
 	queryCache.SetDefault(addrStr, resp)
 
 	c.String(http.StatusOK, respTXT(addrStr, resp, colorful))
+}
+
+func respTXTFailure(format string, obj ...any) string {
+	var txt strings.Builder
+	cRed := color.New(color.FgHiRed)
+
+	// U+00D7 Multiplication Sign: ×
+	txt.WriteString(cRed.Sprint("\u00d7 FAILURE"))
+	txt.WriteString("\r\n")
+	txt.WriteString(fmt.Sprintf(format, obj...))
+	txt.WriteString("\r\n")
+
+	return txt.String()
 }
 
 func respTXT(addrStr string, resp resps.Query, colorful bool) string {
