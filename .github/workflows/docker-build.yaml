@@ -1,4 +1,4 @@
-name: Docker Build
+name: Docker Build Test
 
 on:
   push:
@@ -10,6 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag sourlemonjuice/ipapi-agent:$(date +%s)
