@@ -15,62 +15,53 @@ Typically, your config may look like this:
 
 ```toml
 listen = "::"
-listen_port = 8080
-resolve_domain = true
-# trusted_proxies = ["127.0.0.1", "::1"]
+port = 8080
+trusted_proxies = ["127.0.0.1", "::1"]
 ```
+
+These are the default values, you can also run it without config file.\
+For more examples, see: [config.toml.example](config.toml.example)
 
 ## Config Top-Level section
 
 ### listen
 
-`string`\
-Let server listen to which IP address?
-
+`string` An IPv4 or IPv6 address to use for server listening.\
 Default: `listen = "::"`
 
-### listen_port
+### port
 
-`uint16`\
-Let server listen to which port(TCP/HTTP1.1)?
-
-Default: `listen_port = 8080`
-
-### resolve_domain
-
-`bool`\
-Controls whether domain name resolution is permitted.
-
-Default: `resolve_domain = true`
+`uint16` Server listening port.\
+Default: `port = 8080`
 
 ### trusted_proxies
 
-`string list`\
-Controls which IP addresses or CIDRs can use `X-Real-IP`, this should be a reverse proxy.
-
+`string list` Controls which IP addresses or CIDRs can use `X-Real-IP`, this should be a reverse proxy.\
 Default: `trusted_proxies = ["127.0.0.1", "::1"]`
+
+## Config [resolve] section
+
+### resolve.domain
+
+`bool` Controls whether domain name resolution is permitted.\
+Default: `domain = true`
+
+### resolve.tld_blocklist
+
+`string list` Extend the TLD blocklist used to resolve the domain. You may want to block `.lan` TLD at here, which it supported by some home routers DHCP server but not a part of any standard.\
+Default: none
 
 ## Config [dev] section
 
-> Warning: UNSTABLE entries, must not use these configs in production.
+> [!WARNING]
+> UNSTABLE entries, must not use these configs in production. Only use for development purpose.
 
 ### dev.debug
 
-`bool`\
-GIN debug mode
-
+`bool` GIN debug mode.\
 Default: `debug = false`
 
 ### dev.log
 
-`bool`\
-GIN log, other logs are not affected.
-
+`bool` GIN log, other logs are not affected.\
 Default: `log = false`
-
-### dev.tld_blocklist
-
-`string list`\
-Extend the TLD blocklist used to resolve the domain. You may want to block `.lan` TLD at here, which it supported by some home routers DHCP server but not a part of any standard.
-
-Default: none

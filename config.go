@@ -7,29 +7,35 @@ import (
 )
 
 type config struct {
-	Listen         string    `toml:"listen"`
-	ListenPort     uint16    `toml:"listen_port"`
-	ResolveDomain  bool      `toml:"resolve_domain"`
-	TrustedProxies []string  `toml:"trusted_proxies"`
-	Dev            configDev `toml:"dev"`
+	Listen         string        `toml:"listen"`
+	Port           uint16        `toml:"port"`
+	TrustedProxies []string      `toml:"trusted_proxies"`
+	Resolve        configResolve `toml:"resolve"`
+	Dev            configDev     `toml:"dev"`
+}
+
+type configResolve struct {
+	Domain       bool     `toml:"domain"`
+	TLDBlockList []string `toml:"tld_blocklist"`
 }
 
 type configDev struct {
-	Debug        bool     `toml:"debug"`
-	Log          bool     `toml:"log"`
-	TLDBlockList []string `toml:"tld_blocklist"`
+	Debug bool `toml:"debug"`
+	Log   bool `toml:"log"`
 }
 
 func newConfig() config {
 	return config{
 		Listen:         "::",
-		ListenPort:     8080,
-		ResolveDomain:  true,
+		Port:           8080,
 		TrustedProxies: []string{"127.0.0.1", "::1"},
-		Dev: configDev{
-			Debug:        false,
-			Log:          false,
+		Resolve: configResolve{
+			Domain:       true,
 			TLDBlockList: nil,
+		},
+		Dev: configDev{
+			Debug: false,
+			Log:   false,
 		},
 	}
 }

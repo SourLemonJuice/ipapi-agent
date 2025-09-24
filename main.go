@@ -73,7 +73,7 @@ func main() {
 	router.GET("/query", getQuery)
 	router.GET("/query/:addr", getQuery)
 
-	serverAddr := net.JoinHostPort(conf.Listen, strconv.FormatUint(uint64(conf.ListenPort), 10))
+	serverAddr := net.JoinHostPort(conf.Listen, strconv.FormatUint(uint64(conf.Port), 10))
 	log.Printf("starting server on %v", serverAddr)
 	err = router.Run(serverAddr)
 	if err != nil {
@@ -241,7 +241,7 @@ func queryToAddr(query string) (string, netip.Addr, error) {
 	}
 
 	// should we continue parsing?
-	if !conf.ResolveDomain {
+	if !conf.Resolve.Domain {
 		return "", netip.Addr{}, errors.New("not permitted to resolve domain")
 	}
 
@@ -260,7 +260,7 @@ func resolveDomain(domain string) (netip.Addr, error) {
 	// block some reserved TLDs
 	// you may want to block .lan TLD with config file, because that's not a part of any standard
 	blockedTLD := []string{".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"}
-	blockedTLD = append(blockedTLD, conf.Dev.TLDBlockList...)
+	blockedTLD = append(blockedTLD, conf.Resolve.TLDBlockList...)
 	for _, tld := range blockedTLD {
 		if strings.HasSuffix(domain, tld) {
 			return netip.Addr{}, errors.New("invalid domain")
