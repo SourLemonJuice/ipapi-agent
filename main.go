@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -44,7 +45,7 @@ func main() {
 	conf = newConfig()
 	if len(*confPath) == 0 {
 		_, err = os.Stat("ipapi-agent.toml")
-		if !os.IsNotExist(err) {
+		if !errors.Is(err, fs.ErrNotExist) {
 			*confPath = "ipapi-agent.toml"
 			log.Printf("found default config file %v", *confPath)
 		}
