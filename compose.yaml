@@ -1,0 +1,11 @@
+name: ipapi-agent
+services:
+  ipapi-agent:
+    image: sourlemonjuice/ipapi-agent:latest
+    container_name: ipapi-agent
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    volumes:
+      - ./ipapi.toml:/ipapi.toml:ro
+    command: --config /ipapi.toml

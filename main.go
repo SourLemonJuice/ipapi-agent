@@ -4,12 +4,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/fs"
 	"log"
 	"net"
 	"net/http"
 	"net/netip"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -28,7 +28,7 @@ var conf config
 var queryCache *cache.Cache
 
 func init() {
-	log.SetPrefix("[ipapi-agent] ")
+	log.SetPrefix("[main] ")
 	log.SetFlags(0)
 
 	queryCache = cache.New(6*time.Hour, 30*time.Minute)
@@ -45,10 +45,10 @@ func main() {
 
 	conf = newConfig()
 	if len(*confPath) == 0 {
-		_, err = os.Stat("ipapi-agent.toml")
-		if !errors.Is(err, fs.ErrNotExist) {
-			*confPath = "ipapi-agent.toml"
-			log.Printf("found default config file %v", *confPath)
+		confInfo, err := os.Stat("ipapi.toml")
+		if err == nil && !confInfo.IsDir() {
+			*confPath = "ipapi.toml"
+			log.Printf("found config file in default path %v", *confPath)
 		}
 	}
 	// if no any file found, only default value will be applied.
@@ -63,6 +63,7 @@ func main() {
 	}
 
 	if conf.Dev.Debug {
+		printDebug()
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -93,7 +94,7 @@ func main() {
 func flagVersion(s string) error {
 	fmt.Printf("ipapi-agent version %v\n\n", buildinfo.Version)
 
-	fmt.Printf("Environment: %v %v/%v\n", buildinfo.GoVersion, buildinfo.OS, buildinfo.Arch)
+	fmt.Printf("Environment: %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 
 	os.Exit(0)
 	return nil

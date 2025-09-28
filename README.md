@@ -7,18 +7,18 @@ View the IP country/region and ASN in a JSON or plain text format.
 
 Try our human interface via curl:
 
-```shell
-curl https://ipapi-agent.example.com
+```sh
+curl https://ip.charchar.dev
 ```
 
 Or check out the full REST api reference(include details of the human interface): [docs/api-reference.md](docs/api-reference.md)
 
 ## Configuration
 
-IPAPI-agent use TOML as the config file format. It'll automatically find `ipapi-agent.toml` file in the same directory, or you can specific the config file path via the command line flag:
+IPAPI-agent use TOML as the config file format. It'll automatically find `ipapi.toml` file in the same directory, or you can specific the config file path via the command line flag:
 
-```shell
-ipapi-agent --config ./ipapi-agent.toml
+```sh
+ipapi-agent --config ./ipapi.toml
 ```
 
 Typically, your config may look like this:
@@ -26,11 +26,12 @@ Typically, your config may look like this:
 ```toml
 listen = "::"
 port = 8080
+# use this list in docker container: ["172.16.0.0/12"]
 trusted_proxies = ["127.0.0.1", "::1"]
 ```
 
 These are the default values, you can also run it without config file.\
-For more examples, see: [config.toml.example](config.toml.example)
+For more examples, see: [ipapi.toml.example](ipapi.toml.example)
 
 ## Config Top-Level section
 
