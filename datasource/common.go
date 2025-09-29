@@ -9,7 +9,7 @@ import (
 	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
 
-type Interface interface {
+type APIData interface {
 	// Prepare data for the next use.
 	// If failure, response InternalServerError with JSON message.
 	DoRequest(addr string) error
@@ -18,7 +18,7 @@ type Interface interface {
 	Fill(resp *resps.Query) error
 }
 
-func getJSON(url string, data any) error {
+func getJSON(url string, data APIData) error {
 	var err error
 
 	resp, err := http.Get(url)

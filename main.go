@@ -137,7 +137,7 @@ func getRoot(c *gin.Context) {
 	// let struct cache compatible with getQuery()
 	resp.Status = "success"
 
-	var apidata datasource.Interface = &datasource.IpapiCom{}
+	var apidata datasource.APIData = &datasource.IpapiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
@@ -239,7 +239,7 @@ func getQuery(c *gin.Context) {
 
 	resp.Status = "success"
 
-	var apidata datasource.Interface = &datasource.IpapiCom{}
+	var apidata datasource.APIData = &datasource.IpapiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
