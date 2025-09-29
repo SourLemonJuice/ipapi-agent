@@ -31,6 +31,9 @@ func init() {
 	log.SetPrefix("[main] ")
 	log.SetFlags(0)
 
+	// force output color, ignore the TTY detection, please
+	color.NoColor = false
+
 	queryCache = cache.New(6*time.Hour, 30*time.Minute)
 }
 
