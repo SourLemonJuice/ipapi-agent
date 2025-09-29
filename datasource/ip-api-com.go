@@ -8,6 +8,21 @@ import (
 	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
 
+/*
+Docs: https://ip-api.com/docs/api:json
+Example: http://ip-api.com/json/1.1.1.1?fields=53003
+
+	{
+	  "status": "success",
+	  "country": "Australia",
+	  "countryCode": "AU",
+	  "regionName": "Queensland",
+	  "timezone": "Australia/Brisbane",
+	  "isp": "Cloudflare, Inc",
+	  "org": "APNIC and Cloudflare DNS Resolver project",
+	  "as": "AS13335 Cloudflare, Inc."
+	}
+*/
 type IpapiCom struct {
 	Status      string `json:"status"`
 	Message     string `json:"message"`
@@ -69,6 +84,8 @@ func (data *IpapiCom) getASN() (string, error) {
 		return "", errors.New("wrong AS format")
 	}
 
+	// spilt AS to get ASN:
+	// "AS13335 Cloudflare, Inc."
 	before, _, found := strings.Cut(data.AS, " ")
 	if !found {
 		return "", errors.New("wrong AS format")

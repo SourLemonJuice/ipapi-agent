@@ -6,6 +6,40 @@ import (
 	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
 
+/*
+Docs: https://ipapi.co/api/#complete-location
+Example: https://ipapi.co/1.1.1.1/json/
+
+	{
+	  "ip": "1.1.1.1",
+	  "network": "1.1.1.0/24",
+	  "version": "IPv4",
+	  "city": "Sydney",
+	  "region": "New South Wales",
+	  "region_code": "NSW",
+	  "country": "AU",
+	  "country_name": "Australia",
+	  "country_code": "AU",
+	  "country_code_iso3": "AUS",
+	  "country_capital": "Canberra",
+	  "country_tld": ".au",
+	  "continent_code": "OC",
+	  "in_eu": false,
+	  "postal": "2000",
+	  "latitude": -33.859336,
+	  "longitude": 151.203624,
+	  "timezone": "Australia/Sydney",
+	  "utc_offset": "+1000",
+	  "country_calling_code": "+61",
+	  "currency": "AUD",
+	  "currency_name": "Dollar",
+	  "languages": "en-AU",
+	  "country_area": 7686850,
+	  "country_population": 24992369,
+	  "asn": "AS13335",
+	  "org": "CLOUDFLARENET"
+	}
+*/
 type IpapiCo struct {
 	IP                 string  `json:"ip"`
 	City               string  `json:"city"`
