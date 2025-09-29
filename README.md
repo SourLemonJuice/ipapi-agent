@@ -57,7 +57,7 @@ Default: `trusted_proxies = ["127.0.0.1", "::1"]`
 `bool` Controls whether domain name resolution is permitted.\
 Default: `domain = true`
 
-### resolve.tld_blocklist
+### resolve.block_tld
 
 `string list` Extend the TLD blocklist used to resolve the domain. You may want to block `.lan` TLD at here, which it supported by some home routers DHCP server but not a part of any standard.\
 Default: none

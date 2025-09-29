@@ -15,8 +15,8 @@ type config struct {
 }
 
 type configResolve struct {
-	Domain       bool     `toml:"domain"`
-	TLDBlockList []string `toml:"tld_blocklist"`
+	Domain   bool     `toml:"domain"`
+	BlockTLD []string `toml:"block_tld"`
 }
 
 type configDev struct {
@@ -30,8 +30,8 @@ func newConfig() config {
 		Port:           8080,
 		TrustedProxies: []string{"127.0.0.1", "::1"},
 		Resolve: configResolve{
-			Domain:       true,
-			TLDBlockList: nil,
+			Domain:   true,
+			BlockTLD: nil,
 		},
 		Dev: configDev{
 			Debug: false,
