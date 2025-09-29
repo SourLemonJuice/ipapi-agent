@@ -45,4 +45,4 @@ require (
 	google.golang.org/protobuf v1.36.9 // indirect
 )
 
-replace github.com/fatih/color => github.com/SourLemonJuice/color-fork v0.0.0-20250929012910-c3b521938913
+replace github.com/fatih/color => github.com/SourLemonJuice/color-fork v0.0.0-20250929065032-f7f3f1e7dd4c
