@@ -87,3 +87,8 @@ Default: `debug = false`
 
 `bool` GIN log, other logs are not affected.\
 Default: `log = false`
+
+## License
+
+This software published under Apache-2.0 license.\
+Copyright 2025 酸柠檬猹/SourLemonJuice
