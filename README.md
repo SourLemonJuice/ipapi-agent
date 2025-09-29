@@ -33,6 +33,17 @@ trusted_proxies = ["127.0.0.1", "::1"]
 These are the default values, you can also run it without config file.\
 For more examples, see: [ipapi.toml.example](ipapi.toml.example)
 
+## Deployment
+
+The GitHub CI will automatically build and push the amd64/arm64/riscv64 containers to the registries. You can pull those containers from:
+
+- Docker Hub: [sourlemonjuice/ipapi-agent](https://hub.docker.com/r/sourlemonjuice/ipapi-agent)
+
+The Docker Compose file can reference this simple example: [compose.yaml](compose.yaml)
+
+> [!NOTE]
+> This container is CGO disabled and based on scratch. The package size is very small, but you won't be able to use many utils inside the container for debugging.
+
 ## Config Top-Level section
 
 ### listen
