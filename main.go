@@ -24,8 +24,10 @@ import (
 	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
 
-var conf config
-var queryCache *cache.Cache
+var (
+	conf       config
+	queryCache *cache.Cache = cache.New(6*time.Hour, 30*time.Minute)
+)
 
 func init() {
 	log.SetPrefix("[main] ")
@@ -33,8 +35,6 @@ func init() {
 
 	// force output color, ignore the TTY detection, please
 	color.NoColor = false
-
-	queryCache = cache.New(6*time.Hour, 30*time.Minute)
 }
 
 func main() {
@@ -108,32 +108,33 @@ func getRoot(c *gin.Context) {
 	// Also, don't forget the last line break at the body end.
 	var err error
 
-	query := c.ClientIP()
-	addrStr, addrIP, err := queryToAddr(query)
-	if err != nil {
-		c.Abort()
-		c.String(http.StatusBadRequest, respTXTFailure("Bad query IP address/domain"))
-		return
-	}
-
-	if isSpecialAddr(addrIP) {
-		c.Abort()
-		c.String(http.StatusBadRequest, respTXTFailure("IP address/domain is in invalid range"))
-		return
-	}
-
 	colorful := false
 	if strings.HasPrefix(c.GetHeader("User-Agent"), "curl") {
 		colorful = true
 	}
 
-	var resp resps.Query
-	if val, found := queryCache.Get(addrStr); found {
-		resp = val.(resps.Query)
-		c.String(http.StatusOK, respTXT(addrStr, resp, colorful))
+	query := c.ClientIP()
+	addrStr, addrIP, err := queryToAddr(query)
+	if err != nil {
+		c.Abort()
+		c.String(http.StatusBadRequest, respTXTFailure(colorful, "Bad query IP address/domain"))
 		return
 	}
 
+	if isSpecialAddr(addrIP) {
+		c.Abort()
+		c.String(http.StatusBadRequest, respTXTFailure(colorful, "IP address/domain is in invalid range"))
+		return
+	}
+
+	var resp resps.Query
+	if val, found := queryCache.Get(addrStr); found {
+		resp = val.(resps.Query)
+		c.String(http.StatusOK, respTXT(colorful, addrStr, resp))
+		return
+	}
+
+	// let struct cache compatible with getQuery()
 	resp.Status = "success"
 
 	var apidata datasource.Interface = &datasource.IpapiCom{}
@@ -141,7 +142,7 @@ func getRoot(c *gin.Context) {
 	if err != nil {
 		log.Printf("Data source error: %v", err)
 		c.Abort()
-		c.String(http.StatusInternalServerError, respTXTFailure("Data source error: %v", err))
+		c.String(http.StatusInternalServerError, respTXTFailure(colorful, "Data source error: %v", err))
 		return
 	}
 
@@ -149,18 +150,21 @@ func getRoot(c *gin.Context) {
 	if err != nil {
 		log.Printf("Internal Server Error: %v", err)
 		c.Abort()
-		c.String(http.StatusInternalServerError, respTXTFailure("Internal Server Error"))
+		c.String(http.StatusInternalServerError, respTXTFailure(colorful, "Internal Server Error"))
 		return
 	}
 
 	queryCache.SetDefault(addrStr, resp)
 
-	c.String(http.StatusOK, respTXT(addrStr, resp, colorful))
+	c.String(http.StatusOK, respTXT(colorful, addrStr, resp))
 }
 
-func respTXTFailure(format string, obj ...any) string {
+func respTXTFailure(colorful bool, format string, obj ...any) string {
 	var txt strings.Builder
 	cRed := color.New(color.FgHiRed)
+	if !colorful {
+		cRed.DisableColor()
+	}
 
 	// U+00D7 Multiplication Sign: ×
 	txt.WriteString(cRed.Sprint("\u00d7 FAILURE"))
@@ -171,9 +175,12 @@ func respTXTFailure(format string, obj ...any) string {
 	return txt.String()
 }
 
-func respTXT(addrStr string, resp resps.Query, colorful bool) string {
+func respTXT(colorful bool, addrStr string, resp resps.Query) string {
 	var txt strings.Builder
 	cGreen := color.New(color.FgHiGreen)
+	if !colorful {
+		cGreen.DisableColor()
+	}
 
 	// U+25CF Black Circle: ●
 	// from systemctl status ^_^

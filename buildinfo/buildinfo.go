@@ -4,7 +4,9 @@ import (
 	"runtime/debug"
 )
 
-var Version string
+var (
+	Version string
+)
 
 func init() {
 	Version = "develop"
