@@ -31,12 +31,12 @@ IP address/domain is in invalid range
 Try it with curl:
 
 ```shell
-curl https://ipapi.example.com
+curl https://ip.charchar.dev
 # or request a fake client IP via X-Real-IP, as long as you are in the trusted_proxies list
 curl -H 'X-Real-IP: 1.1.1.1' localhost:8080
 ```
 
-After v0.2.0, if the user agent of the client is `curl`, some ANSI color codes will be added. awa\
+After v0.2.0, if the user agent of the client is `curl`, some ANSI color codes will be added. \awa/\
 I copied those ideas from systemd, haha.
 
 ## GET `/query/<IP addr or domain>`
@@ -66,12 +66,12 @@ Query strings:
 > Note: Request a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).\
 > Even though, many reserved addresses/CIDRs are still not filtered.
 
-If you are querying a reserved domain, it will also return an error. You can extend this list in config file.\
+If you are querying a reserved domain, it will also return an error. You can extend this list in the config file(at `resolve.block_tld`).\
 Current list: `".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"`\
 Source: [Special-use domain name - Wikipedia](https://en.wikipedia.org/wiki/Special-use_domain_name)
 
 Consider that some DNS servers will respond with a geolocation-related IP address to reduce CDN's loading time.\
-If you still feel resolving a domain is dangerous, you can set `resolve_domain = false` in config file to protect your server location securely.
+If you still feel resolving a domain is dangerous, you can set `resolve.domain = false` in config file to protect your server location securely.
 
 ## GET `/query`
 

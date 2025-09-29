@@ -69,7 +69,7 @@ Default: none
 
 ### dev.debug
 
-`bool` GIN debug mode.\
+`bool` Turn on debug information output(GIN and others).\
 Default: `debug = false`
 
 ### dev.log
