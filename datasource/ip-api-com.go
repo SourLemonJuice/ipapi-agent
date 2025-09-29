@@ -1,12 +1,9 @@
 package datasource
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
-	"time"
 
 	"github.com/SourLemonJuice/ipapi-agent/resps"
 )
@@ -24,17 +21,9 @@ type IpapiCom struct {
 }
 
 func (data *IpapiCom) DoRequest(addr string) error {
-	var err error
-
-	resp, err := http.Get(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr))
+	err := getJSON(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr), data)
 	if err != nil {
-		return fmt.Errorf("HTTP request error: %w", err)
-	}
-	defer resp.Body.Close()
-
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return fmt.Errorf("JSON parse error: %w", err)
+		return err
 	}
 
 	switch data.Status {
@@ -59,7 +48,7 @@ func (data *IpapiCom) Fill(resp *resps.Query) error {
 	resp.Timezone = data.Timezone
 
 	// UTCOffset
-	resp.UTCOffset, err = data.getUTCOffset()
+	resp.UTCOffset, err = timezoneToUTCOffset(data.Timezone)
 	if err != nil {
 		return fmt.Errorf("can not convert UTC offset: %w", err)
 	}
@@ -73,18 +62,6 @@ func (data *IpapiCom) Fill(resp *resps.Query) error {
 	}
 
 	return nil
-}
-
-func (data *IpapiCom) getUTCOffset() (int, error) {
-	var err error
-
-	tz, err := time.LoadLocation(data.Timezone)
-	if err != nil {
-		return 0, fmt.Errorf("can not load API returned timezone: %w", err)
-	}
-
-	_, offset_sec := time.Now().In(tz).Zone()
-	return offset_sec / 60, nil
 }
 
 func (data *IpapiCom) getASN() (string, error) {
