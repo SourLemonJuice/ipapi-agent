@@ -48,23 +48,9 @@ func main() {
 
 	log.Print("initializing...")
 
-	conf = config.New()
-	if len(*confPath) == 0 {
-		confInfo, err := os.Stat("ipapi.toml")
-		if err == nil && !confInfo.IsDir() {
-			*confPath = "ipapi.toml"
-			log.Printf("found config file in default path %v", *confPath)
-		}
-	}
-	// if no any file found, only default value will be applied.
-	if len(*confPath) == 0 {
-		log.Print("no config file provided, use defaults")
-	} else {
-		log.Printf("loading config file %v", *confPath)
-		err = conf.DecodeFile(*confPath)
-		if err != nil {
-			log.Fatalf("can't load config file: %v", err)
-		}
+	err = loadConfig(&conf, *confPath)
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	if conf.Dev.Debug {
@@ -102,6 +88,34 @@ func flagVersion(s string) error {
 	fmt.Printf("Environment: %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 
 	os.Exit(0)
+	return nil
+}
+
+func loadConfig(conf *config.Config, hint string) error {
+	var err error
+
+	*conf = config.New()
+
+	var path string
+	if len(hint) == 0 {
+		confInfo, err := os.Stat("ipapi.toml")
+		if err == nil && !confInfo.IsDir() {
+			path = "ipapi.toml"
+			log.Printf("found config file in default path %v", path)
+		}
+	}
+
+	// if no any file found, only default value will be applied.
+	if len(path) == 0 {
+		log.Print("no config file provided, use defaults")
+	} else {
+		log.Printf("loading config file %v", path)
+		err = conf.DecodeFile(path)
+		if err != nil {
+			return fmt.Errorf("can't load config file: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -191,7 +205,7 @@ func respTXT(colorful bool, addrStr string, resp response.Query) string {
 
 	tab := tabwriter.NewWriter(&txt, 0, 0, 0, ' ', tabwriter.AlignRight)
 	fmt.Fprintf(tab, "Location: \t%v, %v (%v)\r\n", resp.Region, resp.Country, resp.CountryCode)
-	fmt.Fprintf(tab, "Timezone: \t%v %v\r\n", resp.Timezone, utcMinToISO8601(resp.UTCOffset))
+	fmt.Fprintf(tab, "Timezone: \t%v %v\r\n", resp.Timezone, utcOffsetToISO8601(resp.UTCOffset))
 	fmt.Fprintf(tab, "ISP: \t%v\r\n", resp.ISP)
 	fmt.Fprintf(tab, "Org: \t%v\r\n", resp.Org)
 	fmt.Fprintf(tab, "ASN: \t%v\r\n", resp.ASN)
@@ -301,7 +315,8 @@ func resolveDomain(domain string) (netip.Addr, error) {
 		return netip.Addr{}, errors.New("invalid domain")
 	}
 	// block some reserved TLDs
-	// you may want to block .lan TLD with config file, because that's not a part of any standard
+	// you may want to block .lan TLD with config file, because that's not a part of any standard.
+	// https://en.wikipedia.org/wiki/Special-use_domain_name
 	blockedTLD := []string{".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"}
 	blockedTLD = append(blockedTLD, conf.Resolve.BlockTLD...)
 	for _, tld := range blockedTLD {
@@ -330,7 +345,7 @@ func isSpecialAddr(addr netip.Addr) bool {
 	return false
 }
 
-func utcMinToISO8601(min int) string {
+func utcOffsetToISO8601(min int) string {
 	var out strings.Builder
 
 	out.WriteString("UTC")
