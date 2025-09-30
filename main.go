@@ -21,9 +21,9 @@ import (
 
 	"github.com/SourLemonJuice/ipapi-agent/internal/build"
 	"github.com/SourLemonJuice/ipapi-agent/internal/config"
-	"github.com/SourLemonJuice/ipapi-agent/internal/datasource"
 	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
 	"github.com/SourLemonJuice/ipapi-agent/internal/response"
+	"github.com/SourLemonJuice/ipapi-agent/internal/upstream"
 )
 
 var (
@@ -139,7 +139,7 @@ func getRoot(c *gin.Context) {
 	// let struct cache compatible with getQuery()
 	resp.Status = "success"
 
-	var apidata datasource.API = &datasource.IpApiCom{}
+	var apidata upstream.API = &upstream.IpApiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
@@ -241,7 +241,7 @@ func getQuery(c *gin.Context) {
 
 	resp.Status = "success"
 
-	var apidata datasource.API = &datasource.IpApiCom{}
+	var apidata upstream.API = &upstream.IpApiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)

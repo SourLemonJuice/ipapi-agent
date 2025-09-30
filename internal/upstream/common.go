@@ -1,4 +1,4 @@
-package datasource
+package upstream
 
 import (
 	"encoding/json"
