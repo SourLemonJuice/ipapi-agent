@@ -9,15 +9,15 @@ import (
 )
 
 var (
-	rotatedFrom     upstream.From
-	rotatedInterval *time.Timer
+	rotatedFrom upstream.From
+	rotatedNext time.Time
 )
 
 func initAPI(conf config.ConfigUpstream) {
 	switch conf.Mode {
 	case config.RotatedUpstream:
 		rotatedFrom = conf.Upstream[rand.IntN(len(conf.Upstream))]
-		rotatedInterval = time.NewTimer(time.Duration(conf.RotatedInterval))
+		rotatedNext = time.Now().Add(time.Duration(conf.RotatedInterval))
 	}
 }
 
@@ -29,13 +29,11 @@ func getAPI(conf config.ConfigUpstream) upstream.API {
 		from := conf.Upstream[rand.IntN(len(conf.Upstream))]
 		return upstream.Select(from)
 	case config.RotatedUpstream:
-		select {
-		case <-rotatedInterval.C:
+		if time.Now().After(rotatedNext) {
 			rotatedFrom = conf.Upstream[rand.IntN(len(conf.Upstream))]
-			return upstream.Select(rotatedFrom)
-		default:
-			return upstream.Select(rotatedFrom)
+			rotatedNext = rotatedNext.Add(time.Duration(conf.RotatedInterval))
 		}
+		return upstream.Select(rotatedFrom)
 	}
 
 	return nil
