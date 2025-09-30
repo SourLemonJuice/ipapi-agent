@@ -23,7 +23,7 @@ Example: http://ip-api.com/json/1.1.1.1?fields=53003
 	  "as": "AS13335 Cloudflare, Inc."
 	}
 */
-type IpapiCom struct {
+type IpApiCom struct {
 	Status      string `json:"status"`
 	Message     string `json:"message"`
 	Country     string `json:"country"`
@@ -35,7 +35,7 @@ type IpapiCom struct {
 	AS          string `json:"as"`
 }
 
-func (data *IpapiCom) DoRequest(addr string) error {
+func (data *IpApiCom) DoRequest(addr string) error {
 	err := getJSON(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr), data)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (data *IpapiCom) DoRequest(addr string) error {
 	return nil
 }
 
-func (data *IpapiCom) Fill(resp *resps.Query) error {
+func (data *IpApiCom) Fill(resp *resps.Query) error {
 	var err error
 
 	resp.DataSource = "ip-api.com"
@@ -79,7 +79,7 @@ func (data *IpapiCom) Fill(resp *resps.Query) error {
 	return nil
 }
 
-func (data *IpapiCom) getASN() (string, error) {
+func (data *IpApiCom) getASN() (string, error) {
 	if !strings.HasPrefix(data.AS, "AS") {
 		return "", errors.New("wrong AS format")
 	}
