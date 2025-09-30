@@ -1,5 +1,7 @@
 package upstream
 
+import "errors"
+
 type From int
 
 const (
@@ -19,4 +21,17 @@ func Select(from From) API {
 	}
 
 	return nil
+}
+
+func ParseName(from string) (From, error) {
+	switch from {
+	case "ip-api.com":
+		return FromIpApiCom, nil
+	case "ipinfo-free":
+		return FromIpinfoFree, nil
+	case "ipapi.co":
+		return FromIpapiCo, nil
+	}
+
+	return -1, errors.New("unknown upstream name")
 }

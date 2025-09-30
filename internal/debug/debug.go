@@ -7,5 +7,5 @@ import (
 )
 
 func Print() {
-	fmt.Printf("NoColor flag: %v\n", color.NoColor)
+	fmt.Printf("has NoColor flag: %v\n", color.NoColor)
 }
