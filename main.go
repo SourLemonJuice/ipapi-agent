@@ -95,18 +95,19 @@ func loadConfig(conf *config.Config, hint string) error {
 	*conf = config.New()
 
 	var path string
+	// if no hint use default path
 	if len(hint) == 0 {
 		confInfo, err := os.Stat("ipapi.toml")
 		if err == nil && !confInfo.IsDir() {
 			path = "ipapi.toml"
 			log.Printf("found config file in default path %v", path)
 		}
+	} else {
+		path = hint
 	}
 
 	// if no any file found, only default value will be applied.
-	if len(path) == 0 {
-		log.Print("no config file provided, use defaults")
-	} else {
+	if len(path) != 0 {
 		log.Printf("loading config file %v", path)
 		err = conf.DecodeFile(path)
 		if err != nil {
@@ -114,6 +115,7 @@ func loadConfig(conf *config.Config, hint string) error {
 		}
 	}
 
+	log.Print("no config file provided, use defaults")
 	return nil
 }
 
