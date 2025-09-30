@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SourLemonJuice/ipapi-agent/resps"
+	"github.com/SourLemonJuice/ipapi-agent/internal/response"
 )
 
 /*
@@ -53,7 +53,7 @@ func (data *IpApiCom) DoRequest(addr string) error {
 	return nil
 }
 
-func (data *IpApiCom) Fill(resp *resps.Query) error {
+func (data *IpApiCom) Fill(resp *response.Query) error {
 	var err error
 
 	resp.DataSource = "ip-api.com"

@@ -19,13 +19,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/patrickmn/go-cache"
 
-	"github.com/SourLemonJuice/ipapi-agent/buildinfo"
-	"github.com/SourLemonJuice/ipapi-agent/datasource"
-	"github.com/SourLemonJuice/ipapi-agent/resps"
+	"github.com/SourLemonJuice/ipapi-agent/internal/build"
+	"github.com/SourLemonJuice/ipapi-agent/internal/config"
+	"github.com/SourLemonJuice/ipapi-agent/internal/datasource"
+	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
+	"github.com/SourLemonJuice/ipapi-agent/internal/response"
 )
 
 var (
-	conf       config
+	conf       config.Config
 	queryCache *cache.Cache = cache.New(6*time.Hour, 30*time.Minute)
 )
 
@@ -46,7 +48,7 @@ func main() {
 
 	log.Print("initializing...")
 
-	conf = newConfig()
+	conf = config.New()
 	if len(*confPath) == 0 {
 		confInfo, err := os.Stat("ipapi.toml")
 		if err == nil && !confInfo.IsDir() {
@@ -59,14 +61,14 @@ func main() {
 		log.Print("no config file provided, use defaults")
 	} else {
 		log.Printf("loading config file %v", *confPath)
-		err = conf.decodeFile(*confPath)
+		err = conf.DecodeFile(*confPath)
 		if err != nil {
 			log.Fatalf("can't load config file: %v", err)
 		}
 	}
 
 	if conf.Dev.Debug {
-		printDebug()
+		debug.Print()
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -95,7 +97,7 @@ func main() {
 }
 
 func flagVersion(s string) error {
-	fmt.Printf("ipapi-agent version %v\n\n", buildinfo.Version)
+	fmt.Printf("ipapi-agent version %v\n\n", build.Version)
 
 	fmt.Printf("Environment: %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 
@@ -127,9 +129,9 @@ func getRoot(c *gin.Context) {
 		return
 	}
 
-	var resp resps.Query
+	var resp response.Query
 	if val, found := queryCache.Get(addrStr); found {
-		resp = val.(resps.Query)
+		resp = val.(response.Query)
 		c.String(http.StatusOK, respTXT(colorful, addrStr, resp))
 		return
 	}
@@ -137,7 +139,7 @@ func getRoot(c *gin.Context) {
 	// let struct cache compatible with getQuery()
 	resp.Status = "success"
 
-	var apidata datasource.APIData = &datasource.IpApiCom{}
+	var apidata datasource.API = &datasource.IpApiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
@@ -175,7 +177,7 @@ func respTXTFailure(colorful bool, format string, obj ...any) string {
 	return txt.String()
 }
 
-func respTXT(colorful bool, addrStr string, resp resps.Query) string {
+func respTXT(colorful bool, addrStr string, resp response.Query) string {
 	var txt strings.Builder
 	cGreen := color.New(color.FgHiGreen)
 	if !colorful {
@@ -229,17 +231,17 @@ func getQuery(c *gin.Context) {
 		return
 	}
 
-	var resp resps.Query
+	var resp response.Query
 	// love cache ^_^
 	if val, found := queryCache.Get(addrStr); found && useCache {
-		resp = val.(resps.Query)
+		resp = val.(response.Query)
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
 	resp.Status = "success"
 
-	var apidata datasource.APIData = &datasource.IpApiCom{}
+	var apidata datasource.API = &datasource.IpApiCom{}
 	err = apidata.DoRequest(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)

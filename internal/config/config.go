@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type config struct {
+type Config struct {
 	Listen         string        `toml:"listen"`
 	Port           uint16        `toml:"port"`
 	TrustedProxies []string      `toml:"trusted_proxies"`
@@ -24,8 +24,8 @@ type configDev struct {
 	Log   bool `toml:"log"`
 }
 
-func newConfig() config {
-	return config{
+func New() Config {
+	return Config{
 		Listen:         "::",
 		Port:           8080,
 		TrustedProxies: []string{"127.0.0.1", "::1"},
@@ -40,7 +40,7 @@ func newConfig() config {
 	}
 }
 
-func (c *config) decodeFile(path string) error {
+func (c *Config) DecodeFile(path string) error {
 	var err error
 
 	md, err := toml.DecodeFile(path, c)

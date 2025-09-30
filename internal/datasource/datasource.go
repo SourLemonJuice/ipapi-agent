@@ -6,19 +6,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SourLemonJuice/ipapi-agent/resps"
+	"github.com/SourLemonJuice/ipapi-agent/internal/response"
 )
 
-type APIData interface {
+type API interface {
 	// Prepare data for the next use.
 	// If failure, response InternalServerError with JSON message.
 	DoRequest(addr string) error
 	// Fill data into the given struct. This won't fill "status" and "message".
 	// If failure, response InternalServerError.
-	Fill(resp *resps.Query) error
+	Fill(resp *response.Query) error
 }
 
-func getJSON(url string, data APIData) error {
+func getJSON(url string, data API) error {
 	var err error
 
 	resp, err := http.Get(url)

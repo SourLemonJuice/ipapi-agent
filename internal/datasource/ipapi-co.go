@@ -3,7 +3,7 @@ package datasource
 import (
 	"fmt"
 
-	"github.com/SourLemonJuice/ipapi-agent/resps"
+	"github.com/SourLemonJuice/ipapi-agent/internal/response"
 )
 
 /*
@@ -79,7 +79,7 @@ func (data *IpapiCo) DoRequest(addr string) error {
 	return nil
 }
 
-func (data *IpapiCo) Fill(resp *resps.Query) error {
+func (data *IpapiCo) Fill(resp *response.Query) error {
 	var err error
 
 	resp.DataSource = "ipapi.co"

@@ -1,4 +1,4 @@
-package resps
+package response
 
 type Query struct {
 	Status      string `json:"status"`

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SourLemonJuice/ipapi-agent/resps"
+	"github.com/SourLemonJuice/ipapi-agent/internal/response"
 	"github.com/biter777/countries"
 )
 
@@ -49,7 +49,7 @@ func (data *IpinfoFree) DoRequest(addr string) error {
 	return nil
 }
 
-func (data *IpinfoFree) Fill(resp *resps.Query) error {
+func (data *IpinfoFree) Fill(resp *response.Query) error {
 	var err error
 
 	resp.DataSource = "IPinfo Free"

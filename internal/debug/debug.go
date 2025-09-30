@@ -1,4 +1,4 @@
-package main
+package debug
 
 import (
 	"fmt"
@@ -6,6 +6,6 @@ import (
 	"github.com/fatih/color"
 )
 
-func printDebug() {
+func Print() {
 	fmt.Printf("NoColor flag: %v\n", color.NoColor)
 }
