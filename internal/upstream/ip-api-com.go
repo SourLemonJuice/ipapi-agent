@@ -35,7 +35,7 @@ type ipApiCom struct {
 	AS          string `json:"as"`
 }
 
-func (data *ipApiCom) DoRequest(addr string) error {
+func (data *ipApiCom) Request(addr string) error {
 	err := getJSON(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr), data)
 	if err != nil {
 		return err

@@ -70,7 +70,7 @@ type ipapiCo struct {
 	Hostname           string  `json:"hostname"`
 }
 
-func (data *ipapiCo) DoRequest(addr string) error {
+func (data *ipapiCo) Request(addr string) error {
 	err := getJSON(fmt.Sprintf("https://ipapi.co/%v/json/", addr), data)
 	if err != nil {
 		return err

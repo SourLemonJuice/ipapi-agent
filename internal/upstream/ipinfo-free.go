@@ -40,7 +40,7 @@ type ipinfoFree struct {
 	Anycast  bool   `json:"anycast"`
 }
 
-func (data *ipinfoFree) DoRequest(addr string) error {
+func (data *ipinfoFree) Request(addr string) error {
 	err := getJSON(fmt.Sprintf("https://ipinfo.io/%v/json", addr), data)
 	if err != nil {
 		return err

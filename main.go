@@ -154,7 +154,7 @@ func getRoot(c *gin.Context) {
 	resp.Status = "success"
 
 	apidata := upstream.Select(upstream.FromIpApiCom)
-	err = apidata.DoRequest(addrStr)
+	err = apidata.Request(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
 		c.Abort()
@@ -256,7 +256,7 @@ func getQuery(c *gin.Context) {
 	resp.Status = "success"
 
 	apidata := upstream.Select(upstream.FromIpApiCom)
-	err = apidata.DoRequest(addrStr)
+	err = apidata.Request(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

@@ -12,7 +12,7 @@ import (
 type API interface {
 	// Prepare data for the next use.
 	// If failure, response InternalServerError with JSON message.
-	DoRequest(addr string) error
+	Request(addr string) error
 	// Fill data into the given struct. This won't fill "status" and "message".
 	// If failure, response InternalServerError.
 	Fill(resp *response.Query) error
