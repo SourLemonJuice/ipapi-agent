@@ -13,27 +13,26 @@ type Config struct {
 	Listen         string         `toml:"listen"`
 	Port           uint16         `toml:"port"`
 	TrustedProxies []string       `toml:"trusted_proxies"`
-	Upstream       configUpstream `toml:"upstream"`
-	Resolve        configResolve  `toml:"resolve"`
-	Dev            configDev      `toml:"dev"`
+	Upstream       ConfigUpstream `toml:"upstream"`
+	Resolve        ConfigResolve  `toml:"resolve"`
+	Dev            ConfigDev      `toml:"dev"`
 }
 
-type configUpstream struct {
-	Type     UpstreamType     `toml:"type"`     // to UpstreamType
-	Upstream upstreamPool     `toml:"upstream"` // when any type
-	Interval upstreamInterval `toml:"interval"` // when UpstreamRotation
+type ConfigUpstream struct {
+	Type     upstreamType            `toml:"type"`
+	Upstream upstreamPool            `toml:"upstream"`
+	Interval upstreamRotatedInterval `toml:"rotated_interval"`
 }
 
-type UpstreamType int
+type upstreamType int
 
 const (
-	UpstreamSingle UpstreamType = iota
-	UpstreamMultiple
-	UpstreamRotation
-	UpstreamSchedule
+	SingleUpstream upstreamType = iota
+	RandomUpstream
+	RotatedUpstream
 )
 
-func (t *UpstreamType) UnmarshalTOML(raw any) error {
+func (t *upstreamType) UnmarshalTOML(raw any) error {
 	val, ok := raw.(string)
 	if !ok {
 		return errors.New("unknown value type")
@@ -41,13 +40,11 @@ func (t *UpstreamType) UnmarshalTOML(raw any) error {
 
 	switch val {
 	case "single":
-		*t = UpstreamSingle
-	case "multiple":
-		*t = UpstreamMultiple
-	case "rotation":
-		*t = UpstreamRotation
-	case "schedule":
-		*t = UpstreamSchedule
+		*t = SingleUpstream
+	case "random":
+		*t = RandomUpstream
+	case "rotated":
+		*t = RotatedUpstream
 	default:
 		return errors.New("unknown upstream type")
 	}
@@ -68,11 +65,15 @@ func (pool *upstreamPool) UnmarshalTOML(raw any) error {
 		return nil
 	}
 
-	valArr, ok := raw.([]string)
+	valAnyArr, ok := raw.([]any)
 	if ok {
 		*pool = []upstream.From{} // init
-		for _, v := range valArr {
-			from, err := upstream.ParseName(v)
+		for _, v := range valAnyArr {
+			valStr, ok := v.(string)
+			if !ok {
+				return errors.New("element not string")
+			}
+			from, err := upstream.ParseName(valStr)
 			if err != nil {
 				return err
 			}
@@ -84,9 +85,9 @@ func (pool *upstreamPool) UnmarshalTOML(raw any) error {
 	return errors.New("unknown value type")
 }
 
-type upstreamInterval time.Duration
+type upstreamRotatedInterval time.Duration
 
-func (interval *upstreamInterval) UnmarshalTOML(raw any) error {
+func (interval *upstreamRotatedInterval) UnmarshalTOML(raw any) error {
 	val, ok := raw.(string)
 	if !ok {
 		return errors.New("unknown value type")
@@ -100,16 +101,16 @@ func (interval *upstreamInterval) UnmarshalTOML(raw any) error {
 		return errors.New("interval is in invalid range(<= 0)")
 	}
 
-	*interval = upstreamInterval(duration)
+	*interval = upstreamRotatedInterval(duration)
 	return nil
 }
 
-type configResolve struct {
+type ConfigResolve struct {
 	Domain   bool     `toml:"domain"`
 	BlockTLD []string `toml:"block_tld"`
 }
 
-type configDev struct {
+type ConfigDev struct {
 	Debug bool `toml:"debug"`
 	Log   bool `toml:"log"`
 }
@@ -119,16 +120,16 @@ func New() Config {
 		Listen:         "::",
 		Port:           8080,
 		TrustedProxies: []string{"127.0.0.1", "::1"},
-		Resolve: configResolve{
+		Resolve: ConfigResolve{
 			Domain:   true,
 			BlockTLD: nil,
 		},
-		Upstream: configUpstream{
-			Type:     UpstreamSingle,
+		Upstream: ConfigUpstream{
+			Type:     SingleUpstream,
 			Upstream: []upstream.From{upstream.FromIpApiCom},
-			Interval: upstreamInterval(time.Duration.Hours(24)),
+			Interval: upstreamRotatedInterval(time.Duration.Hours(24)),
 		},
-		Dev: configDev{
+		Dev: ConfigDev{
 			Debug: false,
 			Log:   false,
 		},
