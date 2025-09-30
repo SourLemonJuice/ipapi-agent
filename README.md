@@ -61,6 +61,45 @@ Default: `port = 8080`
 `string list` Controls which IP addresses or CIDRs can use `X-Real-IP`, this should be a reverse proxy.\
 Default: `trusted_proxies = ["127.0.0.1", "::1"]`
 
+## Config [upstream] section
+
+### upstream.mode
+
+`string` Upstream selection mode. Available values: `single`, `random`, `rotated`.
+
+*single*: only use your only one upstream or the first one in the list.
+
+*random*: randomly choice upstream from your upstream list, per-request applied.
+
+*rotated*: regularly rotate the upstream from your upstream list. The interval time can be set with `rotated_interval` below.
+
+> [!NOTE]
+> Whatever the mode of selection, the cache system will not be affected at all.\
+> For example, if the cache time-to-live is 6 hours, during these 6 hours the responses all come from one upstream in a cache pool.
+
+Default: `mode = "single"`
+
+### upstream.upstream
+
+`string/string list` Set one or more upstreams for further selection. Available codenames:
+
+- `ip-api.com`: very normal option and feel reliable, preferred.\
+  Docs: <https://ip-api.com/docs/api:json>
+- `ipinfo-free`: also preferred, but they say this is a *legacy/free* API :)\
+  Docs: <https://ipinfo.io/missingauth>
+- `ipapi.co`: free rate limit to 100 requests per month... Added just for fun.\
+  Docs: <https://ipapi.co/api/#complete-location>
+
+Default: `upstream = "ip-api.com"`\
+You can also: `upstream = ["ip-api.com", "ipinfo-free"]`
+
+### upstream.rotated_interval
+
+`string` Upstream rotation interval used in `rotated` mode. Parse with go's [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration).
+
+Default: `rotated_interval = "24h"`\
+You can also: `rotated_interval = "72h99m23s"`
+
 ## Config [resolve] section
 
 ### resolve.domain
@@ -70,8 +109,10 @@ Default: `domain = true`
 
 ### resolve.block_tld
 
-`string list` Extend the TLD blocklist used to resolve the domain. You may want to block `.lan` TLD at here, which it supported by some home routers DHCP server but not a part of any standard.\
-Default: none
+`string list` Extend the TLD blocklist used to resolve the domain. You may want to block `.lan` TLD at here, which it supported by some home routers DHCP server but not a part of any standard.
+
+Default: none\
+You can also: `block_tld = [".lan"]`
 
 ## Config [dev] section
 

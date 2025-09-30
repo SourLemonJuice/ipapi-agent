@@ -14,7 +14,7 @@ var (
 )
 
 func initAPI(conf config.ConfigUpstream) {
-	switch conf.Type {
+	switch conf.Mode {
 	case config.RotatedUpstream:
 		rotatedFrom = conf.Upstream[rand.IntN(len(conf.Upstream))]
 		rotatedInterval = time.NewTimer(time.Duration(conf.RotatedInterval))
@@ -22,7 +22,7 @@ func initAPI(conf config.ConfigUpstream) {
 }
 
 func getAPI(conf config.ConfigUpstream) upstream.API {
-	switch conf.Type {
+	switch conf.Mode {
 	case config.SingleUpstream:
 		return upstream.Select(conf.Upstream[0])
 	case config.RandomUpstream:

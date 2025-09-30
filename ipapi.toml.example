@@ -3,6 +3,11 @@ port = 8080
 # use this list in docker container: ["172.16.0.0/12"]
 trusted_proxies = ["127.0.0.1", "::1"]
 
+[upstream]
+mode = "single"
+upstream = "ip-api.com"
+rotated_interval = "24h"
+
 [resolve]
 domain = true
 # block_tld = [".lan"]

@@ -19,20 +19,20 @@ type Config struct {
 }
 
 type ConfigUpstream struct {
-	Type            upstreamType            `toml:"type"`
+	Mode            upstreamMode            `toml:"mode"`
 	Upstream        upstreamPool            `toml:"upstream"`
 	RotatedInterval upstreamRotatedInterval `toml:"rotated_interval"`
 }
 
-type upstreamType int
+type upstreamMode int
 
 const (
-	SingleUpstream upstreamType = iota
+	SingleUpstream upstreamMode = iota
 	RandomUpstream
 	RotatedUpstream
 )
 
-func (t *upstreamType) UnmarshalTOML(raw any) error {
+func (mode *upstreamMode) UnmarshalTOML(raw any) error {
 	val, ok := raw.(string)
 	if !ok {
 		return errors.New("unknown value type")
@@ -40,11 +40,11 @@ func (t *upstreamType) UnmarshalTOML(raw any) error {
 
 	switch val {
 	case "single":
-		*t = SingleUpstream
+		*mode = SingleUpstream
 	case "random":
-		*t = RandomUpstream
+		*mode = RandomUpstream
 	case "rotated":
-		*t = RotatedUpstream
+		*mode = RotatedUpstream
 	default:
 		return errors.New("unknown upstream type")
 	}
@@ -125,7 +125,7 @@ func New() Config {
 			BlockTLD: nil,
 		},
 		Upstream: ConfigUpstream{
-			Type:            SingleUpstream,
+			Mode:            SingleUpstream,
 			Upstream:        []upstream.From{upstream.FromIpApiCom},
 			RotatedInterval: upstreamRotatedInterval(time.Duration.Hours(24)),
 		},
