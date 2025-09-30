@@ -19,9 +19,9 @@ type Config struct {
 }
 
 type ConfigUpstream struct {
-	Type     upstreamType            `toml:"type"`
-	Upstream upstreamPool            `toml:"upstream"`
-	Interval upstreamRotatedInterval `toml:"rotated_interval"`
+	Type            upstreamType            `toml:"type"`
+	Upstream        upstreamPool            `toml:"upstream"`
+	RotatedInterval upstreamRotatedInterval `toml:"rotated_interval"`
 }
 
 type upstreamType int
@@ -125,9 +125,9 @@ func New() Config {
 			BlockTLD: nil,
 		},
 		Upstream: ConfigUpstream{
-			Type:     SingleUpstream,
-			Upstream: []upstream.From{upstream.FromIpApiCom},
-			Interval: upstreamRotatedInterval(time.Duration.Hours(24)),
+			Type:            SingleUpstream,
+			Upstream:        []upstream.From{upstream.FromIpApiCom},
+			RotatedInterval: upstreamRotatedInterval(time.Duration.Hours(24)),
 		},
 		Dev: ConfigDev{
 			Debug: false,
