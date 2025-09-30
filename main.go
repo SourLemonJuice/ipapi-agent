@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/netip"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -74,6 +73,7 @@ func main() {
 	router.GET("/query", getQuery)
 	router.GET("/query/:addr", getQuery)
 
+	// TODO maybe change to Addr?
 	serverAddr := net.JoinHostPort(conf.Listen, strconv.FormatUint(uint64(conf.Port), 10))
 	log.Printf("starting server on %v", serverAddr)
 	err = router.Run(serverAddr)
@@ -83,10 +83,7 @@ func main() {
 }
 
 func flagVersion(s string) error {
-	fmt.Printf("ipapi-agent version %v\n\n", build.Version)
-
-	fmt.Printf("Environment: %v %v/%v\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
-
+	build.PrintVersion()
 	os.Exit(0)
 	return nil
 }
