@@ -40,7 +40,7 @@ Example: https://ipapi.co/1.1.1.1/json/
 	  "org": "CLOUDFLARENET"
 	}
 */
-type IpapiCo struct {
+type ipapiCo struct {
 	IP                 string  `json:"ip"`
 	City               string  `json:"city"`
 	Region             string  `json:"region"`
@@ -70,7 +70,7 @@ type IpapiCo struct {
 	Hostname           string  `json:"hostname"`
 }
 
-func (data *IpapiCo) DoRequest(addr string) error {
+func (data *ipapiCo) DoRequest(addr string) error {
 	err := getJSON(fmt.Sprintf("https://ipapi.co/%v/json/", addr), data)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (data *IpapiCo) DoRequest(addr string) error {
 	return nil
 }
 
-func (data *IpapiCo) Fill(resp *response.Query) error {
+func (data *ipapiCo) Fill(resp *response.Query) error {
 	var err error
 
 	resp.DataSource = "ipapi.co"

@@ -27,7 +27,7 @@ Example: https://ipinfo.io/1.1.1.1/json
 		"anycast": true
 	}
 */
-type IpinfoFree struct {
+type ipinfoFree struct {
 	IP       string `json:"ip"`
 	Hostname string `json:"hostname"`
 	City     string `json:"city"`
@@ -40,7 +40,7 @@ type IpinfoFree struct {
 	Anycast  bool   `json:"anycast"`
 }
 
-func (data *IpinfoFree) DoRequest(addr string) error {
+func (data *ipinfoFree) DoRequest(addr string) error {
 	err := getJSON(fmt.Sprintf("https://ipinfo.io/%v/json", addr), data)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (data *IpinfoFree) DoRequest(addr string) error {
 	return nil
 }
 
-func (data *IpinfoFree) Fill(resp *response.Query) error {
+func (data *ipinfoFree) Fill(resp *response.Query) error {
 	var err error
 
 	resp.DataSource = "IPinfo Free"
