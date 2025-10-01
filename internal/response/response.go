@@ -9,7 +9,7 @@ type Query struct {
 	Region      string `json:"region"`
 	Timezone    string `json:"timezone"`
 	UTCOffset   int    `json:"utcOffset"`
-	ISP         string `json:"isp"`
 	Org         string `json:"org"`
+	ISP         string `json:"isp"` // when no ISP data available, set to empty string
 	ASN         string `json:"asn"`
 }

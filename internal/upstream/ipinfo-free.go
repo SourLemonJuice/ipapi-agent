@@ -72,8 +72,8 @@ func (data *ipinfoFree) Fill(resp *response.Query) error {
 		return errors.New("wrong organization format of IPinfo Free")
 	}
 	resp.ASN = before
-	resp.ISP = after
 	resp.Org = after
+	resp.ISP = ""
 
 	return nil
 }

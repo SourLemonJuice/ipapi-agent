@@ -94,8 +94,8 @@ func (data *ipapiCo) Fill(resp *response.Query) error {
 		return fmt.Errorf("can not convert UTC offset: %w", err)
 	}
 
-	resp.ISP = data.Org // no ISP data available
 	resp.Org = data.Org
+	resp.ISP = ""
 	resp.ASN = data.ASN
 
 	return nil

@@ -53,8 +53,8 @@ Response JSON:
 |region|Region name|`"England"`|string|
 |timezone|Timezone information|`"Europe/London"`|string|
 |utcOffset|Kind like [getTimezoneOffset()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset) but result "UTC+" with positive "UTC-" with negative. Unit is minutes|`480`(UTC+8)|int|
-|isp|Internet service provider(ISP) name|`"Sky UK Limited"`|string|
 |org|Organization name|`"Sky Broadband"`|string|
+|isp|Internet service provider(ISP) name|`"Sky UK Limited"`|string|
 |asn|Autonomous System Number|`"AS5607"`|string|
 
 Query strings:

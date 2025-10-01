@@ -62,15 +62,13 @@ func (data *ipApiCom) Fill(resp *response.Query) error {
 	resp.Region = data.RegionName
 	resp.Timezone = data.Timezone
 
-	// UTCOffset
 	resp.UTCOffset, err = timezoneToUTCOffset(data.Timezone)
 	if err != nil {
 		return fmt.Errorf("can not convert UTC offset: %w", err)
 	}
 
-	// ISP
-	resp.ISP = data.ISP
 	resp.Org = data.Org
+	resp.ISP = data.ISP
 	resp.ASN, err = data.getASN()
 	if err != nil {
 		return fmt.Errorf("can not convert ASN: %w", err)

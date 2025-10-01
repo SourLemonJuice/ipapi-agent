@@ -74,12 +74,11 @@ func main() {
 	router.GET("/query", getQuery)
 	router.GET("/query/:addr", getQuery)
 
-	// TODO maybe change to Addr?
 	serverAddr := net.JoinHostPort(conf.Listen, strconv.FormatUint(uint64(conf.Port), 10))
 	log.Printf("starting server on %v", serverAddr)
 	err = router.Run(serverAddr)
 	if err != nil {
-		log.Fatalf("server(gin) error: %v", err)
+		log.Fatalf("server(GIN) error: %v", err)
 	}
 }
 
