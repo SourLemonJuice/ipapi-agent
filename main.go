@@ -205,8 +205,16 @@ func respTXT(colorful bool, addrStr string, resp response.Query) string {
 	tab := tabwriter.NewWriter(&txt, 0, 0, 0, ' ', tabwriter.AlignRight)
 	fmt.Fprintf(tab, "Location: \t%v, %v (%v)\r\n", resp.Region, resp.Country, resp.CountryCode)
 	fmt.Fprintf(tab, "Timezone: \t%v %v\r\n", resp.Timezone, utcOffsetToISO8601(resp.UTCOffset))
-	fmt.Fprintf(tab, "ISP: \t%v\r\n", resp.ISP)
-	fmt.Fprintf(tab, "Org: \t%v\r\n", resp.Org)
+
+	if len(resp.Org) == 0 {
+		fmt.Fprintf(tab, "Org: \t<Unavailable>\r\n")
+	} else {
+		fmt.Fprintf(tab, "Org: \t%v\r\n", resp.Org)
+	}
+	if len(resp.ISP) > 0 {
+		fmt.Fprintf(tab, "ISP: \t%v\r\n", resp.ISP)
+	}
+
 	fmt.Fprintf(tab, "ASN: \t%v\r\n", resp.ASN)
 	tab.Flush()
 
