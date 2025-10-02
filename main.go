@@ -112,9 +112,10 @@ func loadConfig(conf *config.Config, hint string) error {
 		if err != nil {
 			return fmt.Errorf("can't load config file: %w", err)
 		}
+	} else {
+		log.Print("no config file provided, use defaults")
 	}
 
-	log.Print("no config file provided, use defaults")
 	return nil
 }
 
