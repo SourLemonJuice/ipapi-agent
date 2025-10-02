@@ -37,8 +37,8 @@ For more examples, see: [ipapi.toml.example](ipapi.toml.example)
 
 The GitHub CI will automatically build and push the amd64/arm64/riscv64 containers to the registries. You can pull those containers from:
 
-|||
-|--|--|
+| Registry | URL |
+| --- | --- |
 |Docker Hub|[sourlemonjuice/ipapi-agent](https://hub.docker.com/r/sourlemonjuice/ipapi-agent)|
 |GitHub Container Registry|[ghcr.io/sourlemonjuice/ipapi-agent](https://github.com/SourLemonJuice/ipapi-agent/pkgs/container/ipapi-agent)|
 
