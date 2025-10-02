@@ -53,7 +53,8 @@ func main() {
 	}
 
 	if conf.Dev.Debug {
-		debug.Print()
+		debug.Enable()
+		debug.PrintIntro()
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)

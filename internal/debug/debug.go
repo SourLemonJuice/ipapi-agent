@@ -2,15 +2,26 @@ package debug
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"os"
 
 	"github.com/SourLemonJuice/ipapi-agent/internal/build"
 	"github.com/fatih/color"
 )
 
-func Print() {
+var (
+	// set the flag other than 0 may cause some performance issue
+	Logger *log.Logger = log.New(io.Discard, "[DEBUG] ", 0)
+)
+
+func Enable() {
+	Logger.SetOutput(os.Stdout)
+}
+
+func PrintIntro() {
 	fmt.Println("======Version======")
 	build.PrintVersion()
 	fmt.Println("======End Version======")
-	fmt.Printf("has NoColor flag: %v\n", color.NoColor)
-	fmt.Println("======End Debug Info======")
+	Logger.Printf("has NoColor flag: %v\n", color.NoColor)
 }

@@ -5,18 +5,19 @@ import (
 	"time"
 
 	"github.com/SourLemonJuice/ipapi-agent/internal/config"
+	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
 )
 
 var (
-	rotatedAPIName string
-	rotatedNext    time.Time
+	rotatedName       string
+	rotatedCycleEnded bool = false
 )
 
 func InitSelector(conf config.ConfigUpstream) {
 	switch conf.Mode {
 	case config.RotatedUpstream:
-		rotatedAPIName = conf.Upstream[rand.IntN(len(conf.Upstream))]
-		rotatedNext = time.Now().Add(time.Duration(conf.RotatedInterval))
+		rotatedName = randomCodename(conf.Upstream)
+		newRotatedCycle(conf)
 	}
 }
 
@@ -25,16 +26,26 @@ func SelectAPI(conf config.ConfigUpstream) API {
 	case config.SingleUpstream:
 		return New(conf.Upstream[0])
 	case config.RandomUpstream:
-		name := conf.Upstream[rand.IntN(len(conf.Upstream))]
-		return New(name)
+		return New(randomCodename(conf.Upstream))
 	case config.RotatedUpstream:
-		// TODO update it in another goroutine
-		if time.Now().After(rotatedNext) {
-			rotatedAPIName = conf.Upstream[rand.IntN(len(conf.Upstream))]
-			rotatedNext = rotatedNext.Add(time.Duration(conf.RotatedInterval))
+		if rotatedCycleEnded {
+			rotatedCycleEnded = false
+			newRotatedCycle(conf)
 		}
-		return New(rotatedAPIName)
+		return New(rotatedName)
 	}
 
 	return nil
+}
+
+func randomCodename(list []string) string {
+	return list[rand.IntN(len(list))]
+}
+
+func newRotatedCycle(conf config.ConfigUpstream) {
+	debug.Logger.Println("new rotation cycle")
+	time.AfterFunc(time.Duration(conf.RotatedInterval), func() {
+		rotatedCycleEnded = true
+		rotatedName = randomCodename(conf.Upstream)
+	})
 }
