@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/SourLemonJuice/ipapi-agent/internal/upstream"
 )
 
 type Config struct {
@@ -52,32 +51,24 @@ func (mode *upstreamMode) UnmarshalTOML(raw any) error {
 	return nil
 }
 
-type upstreamPool []upstream.From
+type upstreamPool []string
 
 func (pool *upstreamPool) UnmarshalTOML(raw any) error {
 	valSingle, ok := raw.(string)
 	if ok {
-		from, err := upstream.ParseName(valSingle)
-		if err != nil {
-			return err
-		}
-		*pool = []upstream.From{from}
+		*pool = []string{valSingle}
 		return nil
 	}
 
 	valAnyArr, ok := raw.([]any)
 	if ok {
-		*pool = []upstream.From{} // init
+		*pool = []string{} // init
 		for _, v := range valAnyArr {
 			valStr, ok := v.(string)
 			if !ok {
 				return errors.New("element not string")
 			}
-			from, err := upstream.ParseName(valStr)
-			if err != nil {
-				return err
-			}
-			*pool = append(*pool, from)
+			*pool = append(*pool, valStr)
 		}
 		return nil
 	}
@@ -126,7 +117,7 @@ func New() Config {
 		},
 		Upstream: ConfigUpstream{
 			Mode:            SingleUpstream,
-			Upstream:        []upstream.From{upstream.FromIpApiCom},
+			Upstream:        []string{"ip-api.com"},
 			RotatedInterval: upstreamRotatedInterval(time.Duration.Hours(24)),
 		},
 		Dev: ConfigDev{

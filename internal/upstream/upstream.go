@@ -18,6 +18,19 @@ type API interface {
 	Fill(resp *response.Query) error
 }
 
+func New(codename string) API {
+	switch codename {
+	case "ip-api.com":
+		return &ipApiCom{}
+	case "ipinfo-free":
+		return &ipinfoFree{}
+	case "ipapi.co":
+		return &ipapiCo{}
+	}
+
+	return nil
+}
+
 func getJSON(url string, data API) error {
 	var err error
 

@@ -22,6 +22,7 @@ import (
 	"github.com/SourLemonJuice/ipapi-agent/internal/config"
 	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
 	"github.com/SourLemonJuice/ipapi-agent/internal/response"
+	"github.com/SourLemonJuice/ipapi-agent/internal/upstream"
 )
 
 var (
@@ -58,7 +59,7 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	initAPI(conf.Upstream)
+	upstream.InitSelector(conf.Upstream)
 
 	router := gin.New()
 	router.RedirectTrailingSlash = true
@@ -153,7 +154,7 @@ func getRoot(c *gin.Context) {
 	// let struct cache compatible with getQuery()
 	resp.Status = "success"
 
-	apidata := getAPI(conf.Upstream)
+	apidata := upstream.SelectAPI(conf.Upstream)
 	err = apidata.Request(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
@@ -263,7 +264,7 @@ func getQuery(c *gin.Context) {
 
 	resp.Status = "success"
 
-	apidata := getAPI(conf.Upstream)
+	apidata := upstream.SelectAPI(conf.Upstream)
 	err = apidata.Request(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
