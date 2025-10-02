@@ -73,9 +73,10 @@ Default: `trusted_proxies = ["127.0.0.1", "::1"]`
 
 *single*: only use your only one upstream or the first one in the list.
 
-*random*: randomly choice upstream from your upstream list, per-request applied.
+*random*: randomly choice upstream from the upstream list, per-request applied.
 
-*rotated*: regularly rotate the upstream from your upstream list. The interval time can be set with `rotated_interval` below.
+*rotated* (unstable): keep rotating the upstream from the upstream list. The interval time can be set with `rotated_interval` below.\
+Note, interval time is kind of like a minimal gap of the upstream renewal. The timer will only restarted after a user request.
 
 > [!NOTE]
 > Whatever the mode of selection, the cache system will not be affected at all.\
