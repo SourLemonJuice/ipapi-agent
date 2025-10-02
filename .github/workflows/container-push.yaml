@@ -38,7 +38,7 @@ jobs:
             sourlemonjuice/ipapi-agent
             ghcr.io/sourlemonjuice/ipapi-agent
           tags: |
-            type=edge,event=main
+            type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
