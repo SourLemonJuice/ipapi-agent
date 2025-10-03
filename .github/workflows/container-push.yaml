@@ -35,7 +35,7 @@ jobs:
         id: meta
         with:
           images: |
-            sourlemonjuice/ipapi-agent
+            docker.io/sourlemonjuice/ipapi-agent
             ghcr.io/sourlemonjuice/ipapi-agent
           tags: |
             type=ref,event=branch
