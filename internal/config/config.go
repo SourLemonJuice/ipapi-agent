@@ -118,7 +118,7 @@ func New() Config {
 		Upstream: ConfigUpstream{
 			Mode:            SingleUpstream,
 			Upstream:        []string{"ip-api.com"},
-			RotatedInterval: upstreamRotatedInterval(time.Duration.Hours(24)),
+			RotatedInterval: upstreamRotatedInterval(24 * time.Hour),
 		},
 		Dev: ConfigDev{
 			Debug: false,

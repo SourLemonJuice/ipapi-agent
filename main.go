@@ -60,7 +60,9 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	upstream.InitSelector(conf.Upstream)
+	if err := upstream.InitSelector(conf.Upstream); err != nil {
+		log.Fatalf("failed to initialize upstream selector: %v", err)
+	}
 
 	router := gin.New()
 	router.RedirectTrailingSlash = true
@@ -70,7 +72,9 @@ func main() {
 		router.Use(gin.Logger())
 	}
 
-	router.SetTrustedProxies(conf.TrustedProxies)
+	if err := router.SetTrustedProxies(conf.TrustedProxies); err != nil {
+		log.Fatalf("invalid trusted proxies configuration: %v", err)
+	}
 
 	router.GET("/", getRoot)
 	router.GET("/query", getQuery)
@@ -155,7 +159,13 @@ func getRoot(c *gin.Context) {
 	// let struct cache compatible with getQuery()
 	resp.Status = "success"
 
-	apidata := upstream.SelectAPI(conf.Upstream)
+	apidata, err := upstream.SelectAPI(conf.Upstream)
+	if err != nil {
+		log.Printf("Upstream selection error: %v", err)
+		c.Abort()
+		c.String(http.StatusInternalServerError, respTXTFailure(colorful, "Internal Server Error"))
+		return
+	}
 	err = apidata.Request(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)
@@ -265,7 +275,15 @@ func getQuery(c *gin.Context) {
 
 	resp.Status = "success"
 
-	apidata := upstream.SelectAPI(conf.Upstream)
+	apidata, err := upstream.SelectAPI(conf.Upstream)
+	if err != nil {
+		log.Printf("Upstream selection error: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status":  "failure",
+			"message": "Internal Server Error",
+		})
+		return
+	}
 	err = apidata.Request(addrStr)
 	if err != nil {
 		log.Printf("Data source error: %v", err)

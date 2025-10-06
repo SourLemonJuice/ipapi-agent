@@ -18,17 +18,17 @@ type API interface {
 	Fill(resp *response.Query) error
 }
 
-func New(codename string) API {
+func New(codename string) (API, error) {
 	switch codename {
 	case "ip-api.com":
-		return &ipApiCom{}
+		return &ipApiCom{}, nil
 	case "ipinfo-free":
-		return &ipinfoFree{}
+		return &ipinfoFree{}, nil
 	case "ipapi.co":
-		return &ipapiCo{}
+		return &ipapiCo{}, nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("unknown upstream codename: %s", codename)
 }
 
 func getJSON(url string, data API) error {

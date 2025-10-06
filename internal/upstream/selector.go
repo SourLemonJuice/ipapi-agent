@@ -1,7 +1,10 @@
 package upstream
 
 import (
+	"errors"
+	"fmt"
 	"math/rand/v2"
+	"sync"
 	"time"
 
 	"github.com/SourLemonJuice/ipapi-agent/internal/config"
@@ -9,43 +12,119 @@ import (
 )
 
 var (
+	rotationMu        sync.RWMutex
 	rotatedName       string
-	rotatedCycleEnded bool = false
+	rotatedCycleEnded bool
+	rotationTimer     *time.Timer
 )
 
-func InitSelector(conf config.ConfigUpstream) {
-	switch conf.Mode {
-	case config.RotatedUpstream:
-		rotatedName = randomCodename(conf.Upstream)
-		newRotatedCycle(conf)
+func InitSelector(conf config.ConfigUpstream) error {
+	if err := validateUpstreamConfig(conf); err != nil {
+		return err
 	}
-}
 
-func SelectAPI(conf config.ConfigUpstream) API {
 	switch conf.Mode {
-	case config.SingleUpstream:
-		return New(conf.Upstream[0])
-	case config.RandomUpstream:
-		return New(randomCodename(conf.Upstream))
 	case config.RotatedUpstream:
-		if rotatedCycleEnded {
-			rotatedCycleEnded = false
-			newRotatedCycle(conf)
+		if err := newRotatedCycle(conf); err != nil {
+			return err
 		}
-		return New(rotatedName)
 	}
 
 	return nil
 }
 
-func randomCodename(list []string) string {
-	return list[rand.IntN(len(list))]
+func SelectAPI(conf config.ConfigUpstream) (API, error) {
+	if len(conf.Upstream) == 0 {
+		return nil, errors.New("upstream pool is empty")
+	}
+
+	switch conf.Mode {
+	case config.SingleUpstream:
+		return New(conf.Upstream[0])
+	case config.RandomUpstream:
+		codename, err := randomCodename(conf.Upstream)
+		if err != nil {
+			return nil, err
+		}
+		return New(codename)
+	case config.RotatedUpstream:
+		rotationMu.RLock()
+		name := rotatedName
+		cycleEnded := rotatedCycleEnded
+		rotationMu.RUnlock()
+
+		if cycleEnded {
+			if err := newRotatedCycle(conf); err != nil {
+				return nil, err
+			}
+
+			rotationMu.RLock()
+			name = rotatedName
+			rotationMu.RUnlock()
+		}
+
+		if name == "" {
+			return nil, errors.New("rotated upstream not initialized")
+		}
+
+		return New(name)
+	}
+
+	return nil, errors.New("unsupported upstream mode")
 }
 
-func newRotatedCycle(conf config.ConfigUpstream) {
-	debug.Logger.Println("new rotation cycle")
-	time.AfterFunc(time.Duration(conf.RotatedInterval), func() {
+func randomCodename(list []string) (string, error) {
+	if len(list) == 0 {
+		return "", errors.New("upstream pool is empty")
+	}
+	return list[rand.IntN(len(list))], nil
+}
+
+func newRotatedCycle(conf config.ConfigUpstream) error {
+	name, err := randomCodename(conf.Upstream)
+	if err != nil {
+		return err
+	}
+
+	interval := time.Duration(conf.RotatedInterval)
+	if interval <= 0 {
+		return errors.New("rotated interval must be greater than zero")
+	}
+
+	rotationMu.Lock()
+	if rotationTimer != nil {
+		rotationTimer.Stop()
+	}
+	rotatedName = name
+	rotatedCycleEnded = false
+	rotationTimer = time.AfterFunc(interval, func() {
+		rotationMu.Lock()
 		rotatedCycleEnded = true
-		rotatedName = randomCodename(conf.Upstream)
+		rotationTimer = nil
+		rotationMu.Unlock()
 	})
+	rotationMu.Unlock()
+
+	debug.Logger.Println("new rotation cycle")
+	return nil
+}
+
+func validateUpstreamConfig(conf config.ConfigUpstream) error {
+	if len(conf.Upstream) == 0 {
+		return errors.New("upstream pool is empty")
+	}
+
+	for _, codename := range conf.Upstream {
+		if _, err := New(codename); err != nil {
+			return fmt.Errorf("unsupported upstream %q: %w", codename, err)
+		}
+	}
+
+	if conf.Mode == config.RotatedUpstream {
+		if time.Duration(conf.RotatedInterval) <= 0 {
+			return errors.New("rotated interval must be greater than zero")
+		}
+	}
+
+	return nil
 }
