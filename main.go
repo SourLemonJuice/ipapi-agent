@@ -49,7 +49,8 @@ func main() {
 
 	err = loadConfig(&conf, *confPath)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		os.Exit(1)
 	}
 
 	if conf.Dev.Debug {
@@ -70,7 +71,11 @@ func main() {
 		router.Use(gin.Logger())
 	}
 
-	router.SetTrustedProxies(conf.TrustedProxies)
+	err = router.SetTrustedProxies(conf.TrustedProxies)
+	if err != nil {
+		log.Printf("can't set trusted proxies: %v", err)
+		os.Exit(1)
+	}
 
 	router.GET("/", getRoot)
 	router.GET("/query", getQuery)
@@ -80,7 +85,8 @@ func main() {
 	log.Printf("starting server on %v", serverAddr)
 	err = router.Run(serverAddr)
 	if err != nil {
-		log.Fatalf("server(GIN) error: %v", err)
+		log.Printf("server(GIN) error: %v", err)
+		os.Exit(1)
 	}
 }
 
