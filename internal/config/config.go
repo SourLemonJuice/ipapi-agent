@@ -18,41 +18,14 @@ type Config struct {
 }
 
 type ConfigUpstream struct {
-	Mode            upstreamMode            `toml:"mode"`
-	Upstream        upstreamPool            `toml:"upstream"`
-	RotatedInterval upstreamRotatedInterval `toml:"rotated_interval"`
-}
-
-type upstreamMode int
-
-const (
-	SingleUpstream upstreamMode = iota
-	RandomUpstream
-	RotatedUpstream
-)
-
-func (mode *upstreamMode) UnmarshalTOML(raw any) error {
-	val, ok := raw.(string)
-	if !ok {
-		return errors.New("unknown value type")
-	}
-
-	switch val {
-	case "single":
-		*mode = SingleUpstream
-	case "random":
-		*mode = RandomUpstream
-	case "rotated":
-		*mode = RotatedUpstream
-	default:
-		return errors.New("unknown upstream type")
-	}
-
-	return nil
+	Mode            string        `toml:"mode"`
+	Upstream        upstreamPool  `toml:"upstream"`
+	RotatedInterval time.Duration `toml:"rotated_interval"`
 }
 
 type upstreamPool []string
 
+// accept both a single string or a list of strings
 func (pool *upstreamPool) UnmarshalTOML(raw any) error {
 	valSingle, ok := raw.(string)
 	if ok {
@@ -76,26 +49,6 @@ func (pool *upstreamPool) UnmarshalTOML(raw any) error {
 	return errors.New("unknown value type")
 }
 
-type upstreamRotatedInterval time.Duration
-
-func (interval *upstreamRotatedInterval) UnmarshalTOML(raw any) error {
-	val, ok := raw.(string)
-	if !ok {
-		return errors.New("unknown value type")
-	}
-
-	duration, err := time.ParseDuration(val)
-	if err != nil {
-		return err
-	}
-	if duration <= 0 {
-		return errors.New("interval is in invalid range(<= 0)")
-	}
-
-	*interval = upstreamRotatedInterval(duration)
-	return nil
-}
-
 type ConfigResolve struct {
 	Domain   bool     `toml:"domain"`
 	BlockTLD []string `toml:"block_tld"`
@@ -116,9 +69,9 @@ func New() Config {
 			BlockTLD: nil,
 		},
 		Upstream: ConfigUpstream{
-			Mode:            SingleUpstream,
+			Mode:            "single",
 			Upstream:        []string{"ip-api.com"},
-			RotatedInterval: upstreamRotatedInterval(time.Duration.Hours(24)),
+			RotatedInterval: 24 * time.Hour,
 		},
 		Dev: ConfigDev{
 			Debug: false,
@@ -138,6 +91,27 @@ func (c *Config) DecodeFile(path string) error {
 	unknowns := md.Undecoded()
 	if len(unknowns) != 0 {
 		return fmt.Errorf("invalid TOML keys: %v", unknowns)
+	}
+
+	err = c.valid()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Config) valid() error {
+	switch c.Upstream.Mode {
+	case "single":
+	case "random":
+	case "rotated":
+	default:
+		return errors.New("upstream.mode is unknown type")
+	}
+
+	if c.Upstream.RotatedInterval <= 0 {
+		return errors.New("upstream.rotated_interval is in not positive")
 	}
 
 	return nil

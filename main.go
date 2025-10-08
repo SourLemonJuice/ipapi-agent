@@ -47,7 +47,7 @@ func main() {
 
 	log.Print("initializing...")
 
-	err = loadConfig(&conf, *confPath)
+	err = findConfig(&conf, *confPath)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -96,7 +96,7 @@ func flagVersion(s string) error {
 	return nil
 }
 
-func loadConfig(conf *config.Config, hint string) error {
+func findConfig(conf *config.Config, hint string) error {
 	var err error
 
 	*conf = config.New()
