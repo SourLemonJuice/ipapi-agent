@@ -66,7 +66,7 @@ Default: `port = 8080`
 
 ### trusted_proxies
 
-`string list` Controls which IP addresses or CIDRs can use `X-Real-IP`, this should be a reverse proxy.\
+`string list` Controls which IP addresses or CIDRs can use `X-Forwarded-For` or `X-Real-IP`, this should be a reverse proxy.\
 Default: `trusted_proxies = ["127.0.0.1", "::1"]`
 
 ## Config [upstream] section
@@ -126,7 +126,7 @@ You can also: `block_tld = [".lan"]`
 ## Config [dev] section
 
 > [!WARNING]
-> UNSTABLE entries, must not use these configs in production. Only use for development purpose.
+> These entries can not be used in production. Development purpose only.
 
 ### dev.debug
 
