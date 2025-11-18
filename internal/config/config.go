@@ -106,6 +106,7 @@ func (c *Config) valid() error {
 	case "single":
 	case "random":
 	case "rotated":
+		return errors.New("upstream.mode 'rotated' didn't implemented")
 	default:
 		return errors.New("upstream.mode is unknown type")
 	}

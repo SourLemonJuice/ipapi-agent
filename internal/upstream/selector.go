@@ -2,23 +2,11 @@ package upstream
 
 import (
 	"math/rand/v2"
-	"time"
 
 	"github.com/SourLemonJuice/ipapi-agent/internal/config"
-	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
-)
-
-var (
-	rotatedName       string
-	rotatedCycleEnded bool = false
 )
 
 func InitSelector(conf config.ConfigUpstream) {
-	switch conf.Mode {
-	case "rotated":
-		rotatedName = randomCodename(conf.Pool)
-		newRotatedCycle(conf)
-	}
 }
 
 func SelectAPI(conf config.ConfigUpstream) API {
@@ -28,11 +16,8 @@ func SelectAPI(conf config.ConfigUpstream) API {
 	case "random":
 		return New(randomCodename(conf.Pool))
 	case "rotated":
-		if rotatedCycleEnded {
-			rotatedCycleEnded = false
-			newRotatedCycle(conf)
-		}
-		return New(rotatedName)
+		// TODO
+		panic("rotated upstream select mode didn't implemented")
 	}
 
 	return nil
@@ -40,12 +25,4 @@ func SelectAPI(conf config.ConfigUpstream) API {
 
 func randomCodename(list []string) string {
 	return list[rand.IntN(len(list))]
-}
-
-func newRotatedCycle(conf config.ConfigUpstream) {
-	debug.Logger.Println("new rotation cycle")
-	time.AfterFunc(time.Duration(conf.RotatedInterval), func() {
-		rotatedCycleEnded = true
-		rotatedName = randomCodename(conf.Pool)
-	})
 }

@@ -28,16 +28,11 @@ Example: https://ipinfo.io/1.1.1.1/json
 	}
 */
 type ipinfoFree struct {
-	IP       string `json:"ip"`
-	Hostname string `json:"hostname"`
-	City     string `json:"city"`
 	Region   string `json:"region"`
 	Country  string `json:"country"`
-	Loc      string `json:"loc"`
 	Org      string `json:"org"`
 	Timezone string `json:"timezone"`
-	README   string `json:"readme"`
-	Anycast  bool   `json:"anycast"`
+	Anycast  bool   `json:"anycast"` // TODO try to display it
 }
 
 func (data *ipinfoFree) Request(addr string) error {

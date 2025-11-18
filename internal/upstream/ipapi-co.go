@@ -41,33 +41,12 @@ Example: https://ipapi.co/1.1.1.1/json/
 	}
 */
 type ipapiCo struct {
-	IP                 string  `json:"ip"`
-	City               string  `json:"city"`
-	Region             string  `json:"region"`
-	RegionCode         string  `json:"region_code"`
-	Country            string  `json:"country"`
-	CountryCode        string  `json:"country_code"`
-	CountryCodeISO3    string  `json:"country_code_iso3"`
-	CountryName        string  `json:"country_name"`
-	CountryCapital     string  `json:"country_capital"`
-	CountryTLD         string  `json:"country_tld"`
-	CountryArea        float32 `json:"country_area"`
-	CountryPopulation  string  `json:"country_population"`
-	ContinentCode      string  `json:"continent_code"`
-	InEU               bool    `json:"in_eu"`
-	Postal             string  `json:"postal"`
-	Latitude           float32 `json:"latitude"`
-	Longitude          float32 `json:"longitude"`
-	Latlong            string  `json:"latlong"`
-	Timezone           string  `json:"timezone"`
-	UTCOffset          string  `json:"utc_offset"`
-	CountryCallingCode string  `json:"country_calling_code"`
-	Currency           string  `json:"currency"`
-	CurrencyName       string  `json:"currency_name"`
-	Languages          string  `json:"languages"`
-	ASN                string  `json:"asn"`
-	Org                string  `json:"org"`
-	Hostname           string  `json:"hostname"`
+	Region      string `json:"region"`
+	CountryCode string `json:"country_code"`
+	CountryName string `json:"country_name"`
+	Timezone    string `json:"timezone"`
+	ASN         string `json:"asn"`
+	Org         string `json:"org"`
 }
 
 func (data *ipapiCo) Request(addr string) error {
