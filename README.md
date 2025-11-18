@@ -75,7 +75,7 @@ Default: `trusted_proxies = ["127.0.0.1", "::1"]`
 
 *random*: randomly choice upstream from the upstream list, per-request applied.
 
-*rotated* (unstable): keep rotating the upstream from the upstream list. The interval time can be set with `rotated_interval` below.\
+*rotated* (broken): keep rotating the upstream from the upstream list. The interval time can be set with `rotated_interval` below.\
 Note, interval time is kind of like a minimal gap of the upstream renewal. The timer will only restarted after a user request.
 
 > [!NOTE]
@@ -84,7 +84,7 @@ Note, interval time is kind of like a minimal gap of the upstream renewal. The t
 
 Default: `mode = "single"`
 
-### upstream.upstream
+### upstream.pool
 
 `string/string list` Set one or more upstreams for further selection. Available codenames:
 
@@ -95,8 +95,8 @@ Default: `mode = "single"`
 - `ipapi.co`: free rate limit to 100 requests per month... Added just for fun.\
   Docs: <https://ipapi.co/api/#complete-location>
 
-Default: `upstream = "ip-api.com"`\
-You can also: `upstream = ["ip-api.com", "ipinfo-free"]`
+Default: `pool = "ip-api.com"`\
+You can also: `pool = ["ip-api.com", "ipinfo-free"]`
 
 ### upstream.rotated_interval
 

@@ -16,7 +16,7 @@ var (
 func InitSelector(conf config.ConfigUpstream) {
 	switch conf.Mode {
 	case "rotated":
-		rotatedName = randomCodename(conf.Upstream)
+		rotatedName = randomCodename(conf.Pool)
 		newRotatedCycle(conf)
 	}
 }
@@ -24,9 +24,9 @@ func InitSelector(conf config.ConfigUpstream) {
 func SelectAPI(conf config.ConfigUpstream) API {
 	switch conf.Mode {
 	case "single":
-		return New(conf.Upstream[0])
+		return New(conf.Pool[0])
 	case "random":
-		return New(randomCodename(conf.Upstream))
+		return New(randomCodename(conf.Pool))
 	case "rotated":
 		if rotatedCycleEnded {
 			rotatedCycleEnded = false
@@ -46,6 +46,6 @@ func newRotatedCycle(conf config.ConfigUpstream) {
 	debug.Logger.Println("new rotation cycle")
 	time.AfterFunc(time.Duration(conf.RotatedInterval), func() {
 		rotatedCycleEnded = true
-		rotatedName = randomCodename(conf.Upstream)
+		rotatedName = randomCodename(conf.Pool)
 	})
 }

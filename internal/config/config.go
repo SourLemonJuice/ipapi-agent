@@ -19,7 +19,7 @@ type Config struct {
 
 type ConfigUpstream struct {
 	Mode            string        `toml:"mode"`
-	Upstream        upstreamPool  `toml:"upstream"`
+	Pool            upstreamPool  `toml:"pool"`
 	RotatedInterval time.Duration `toml:"rotated_interval"`
 }
 
@@ -70,7 +70,7 @@ func New() Config {
 		},
 		Upstream: ConfigUpstream{
 			Mode:            "single",
-			Upstream:        []string{"ip-api.com"},
+			Pool:            []string{"ip-api.com"},
 			RotatedInterval: 24 * time.Hour,
 		},
 		Dev: ConfigDev{
