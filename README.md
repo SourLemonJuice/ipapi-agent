@@ -21,16 +21,6 @@ IPAPI-agent use TOML as the config file format. It'll automatically find `ipapi.
 ipapi-agent --config ./ipapi.toml
 ```
 
-Typically, your config may look like this:
-
-```toml
-listen = "::"
-port = 8080
-# use this list in docker container: ["172.16.0.0/12"]
-trusted_proxies = ["127.0.0.1", "::1"]
-```
-
-These are the default values, you can also run it without config file.\
 For more examples, see: [ipapi.toml.example](ipapi.toml.example)
 
 ## Deployment
@@ -42,11 +32,25 @@ The GitHub CI will automatically build and push the amd64/arm64/riscv64 containe
 |Docker Hub|[sourlemonjuice/ipapi-agent](https://hub.docker.com/r/sourlemonjuice/ipapi-agent)|
 |GitHub Container Registry|[ghcr.io/sourlemonjuice/ipapi-agent](https://github.com/SourLemonJuice/ipapi-agent/pkgs/container/ipapi-agent)|
 
-The Docker Compose file can reference this simple example: [compose.yaml](compose.yaml).\
-After v0.5.0, you can use a sematic tag like `0.5` to reference the latest version of v0.5.* or set to full version `0.5.0`. This replaced old git tag based naming: `v0.4.1`
+The example Docker Compose file:
+
+```yaml
+name: ipapi
+services:
+  ipapi-agent:
+    image: sourlemonjuice/ipapi-agent:latest
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    volumes:
+      - ./ipapi.toml:/ipapi.toml:ro
+    # set config file path, if needed
+    # command: --config /ipapi.toml
+```
 
 > [!NOTE]
-> This container is CGO disabled and based on scratch. The package size is very small, but you won't be able to use many utils inside the container for debugging.
+> This container is CGO disabled and based on scratch. The package size is very small, but you won't be able to use many utils inside the container for debugging.\
+> Also, after v0.5.0, you can use a sematic tag like `0.5` to reference the latest version of v0.5.* or set to full version `0.5.0`. This replaced old git tag based naming: `v0.4.1`.
 
 ## Config Top-Level section
 
