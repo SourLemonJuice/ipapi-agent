@@ -109,19 +109,19 @@ You can also: `pool = ["ip-api.com", "ipinfo-free"]`
 Default: `rotated_interval = "24h"`\
 You can also: `rotated_interval = "72h99m23s"`
 
-## Config [resolve] section
+## Config [domain] section
 
-### resolve.domain
+### domain.enabled
 
 `bool` Controls whether domain name resolution is permitted.\
-Default: `domain = true`
+Default: `enabled = true`
 
-### resolve.block_tld
+### domain.block_suffix
 
-`string list` Extend the TLD blocklist used to resolve the domain. You may want to block `.lan` TLD at here, which it supported by some home routers DHCP server but not a part of any standard.
+`string list` Extend the domain public suffix(not only TLD) blocklist used when resolving the domain. You may want to block `lan` TLD here, which it supported by some home routers DHCP server but standard.
 
-Default: none\
-You can also: `block_tld = [".lan"]`
+Built-in list is: `"alt", "arpa", "invalid", "local", "localhost", "onion", "test", "internal"`\
+You can also append it: `block_suffix = ["lan"]`
 
 ## Config [dev] section
 

@@ -13,7 +13,7 @@ type Config struct {
 	Port           uint16         `toml:"port"`
 	TrustedProxies []string       `toml:"trusted_proxies"`
 	Upstream       ConfigUpstream `toml:"upstream"`
-	Resolve        ConfigResolve  `toml:"resolve"`
+	Domain         ConfigDomain   `toml:"domain"`
 	Dev            ConfigDev      `toml:"dev"`
 }
 
@@ -49,9 +49,9 @@ func (pool *upstreamPool) UnmarshalTOML(raw any) error {
 	return errors.New("unknown value type")
 }
 
-type ConfigResolve struct {
-	Domain   bool     `toml:"domain"`
-	BlockTLD []string `toml:"block_tld"`
+type ConfigDomain struct {
+	Enabled     bool     `toml:"enabled"`
+	BlockSuffix []string `toml:"block_suffix"`
 }
 
 type ConfigDev struct {
@@ -64,9 +64,9 @@ func New() Config {
 		Listen:         "::",
 		Port:           8080,
 		TrustedProxies: []string{"127.0.0.1", "::1"},
-		Resolve: ConfigResolve{
-			Domain:   true,
-			BlockTLD: nil,
+		Domain: ConfigDomain{
+			Enabled:     true,
+			BlockSuffix: nil,
 		},
 		Upstream: ConfigUpstream{
 			Mode:            "single",
@@ -93,7 +93,7 @@ func (c *Config) DecodeFile(path string) error {
 		return fmt.Errorf("invalid TOML keys: %v", unknowns)
 	}
 
-	err = c.valid()
+	err = c.validate()
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (c *Config) DecodeFile(path string) error {
 	return nil
 }
 
-func (c *Config) valid() error {
+func (c *Config) validate() error {
 	switch c.Upstream.Mode {
 	case "single":
 	case "random":
@@ -114,6 +114,12 @@ func (c *Config) valid() error {
 	if c.Upstream.RotatedInterval <= 0 {
 		return errors.New("upstream.rotated_interval is in not positive")
 	}
+
+	// block some reserved TLDs
+	// you may want to block .lan TLD with config file, because that's not a part of any standard.
+	// https://en.wikipedia.org/wiki/Special-use_domain_name
+	reservedSuffix := []string{"alt", "arpa", "invalid", "local", "localhost", "onion", "test", "internal"}
+	c.Domain.BlockSuffix = append(c.Domain.BlockSuffix, reservedSuffix...)
 
 	return nil
 }

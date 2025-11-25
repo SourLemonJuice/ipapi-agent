@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/netip"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -17,6 +18,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	"github.com/patrickmn/go-cache"
+	"golang.org/x/net/publicsuffix"
 
 	"github.com/SourLemonJuice/ipapi-agent/internal/build"
 	"github.com/SourLemonJuice/ipapi-agent/internal/config"
@@ -314,7 +316,7 @@ func queryToAddr(query string) (string, netip.Addr, error) {
 	}
 
 	// should we continue parsing?
-	if !conf.Resolve.Domain {
+	if !conf.Domain.Enabled {
 		return "", netip.Addr{}, errors.New("not permitted to resolve domain")
 	}
 
@@ -327,18 +329,10 @@ func queryToAddr(query string) (string, netip.Addr, error) {
 }
 
 func resolveDomain(domain string) (netip.Addr, error) {
-	if !strings.Contains(domain, ".") {
+	suffix, _ := publicsuffix.PublicSuffix(domain)
+
+	if slices.Contains(conf.Domain.BlockSuffix, suffix) {
 		return netip.Addr{}, errors.New("invalid domain")
-	}
-	// block some reserved TLDs
-	// you may want to block .lan TLD with config file, because that's not a part of any standard.
-	// https://en.wikipedia.org/wiki/Special-use_domain_name
-	blockedTLD := []string{".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"}
-	blockedTLD = append(blockedTLD, conf.Resolve.BlockTLD...)
-	for _, tld := range blockedTLD {
-		if strings.HasSuffix(domain, tld) {
-			return netip.Addr{}, errors.New("invalid domain")
-		}
 	}
 
 	addrStrArr, err := net.LookupHost(domain)

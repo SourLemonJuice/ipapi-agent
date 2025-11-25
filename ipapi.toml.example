@@ -8,6 +8,6 @@ mode = "single"
 pool = "ip-api.com"
 rotated_interval = "24h"
 
-[resolve]
-domain = true
-# block_tld = [".lan"]
+[domain]
+enabled = true
+# block_suffix = ["lan"]
