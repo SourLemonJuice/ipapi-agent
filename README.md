@@ -54,26 +54,26 @@ services:
 
 ## Config Top-Level section
 
-### listen
+### listen `string`
 
-`string` An IPv4 or IPv6 address to use for server listening.\
+An IPv4 or IPv6 address to use for server listening.\
 Default: `listen = "::"`
 
-### port
+### port `uint16`
 
-`uint16` Server listening port.\
+Server listening port.\
 Default: `port = 8080`
 
-### trusted_proxies
+### trusted_proxies `string list`
 
-`string list` Controls which IP addresses or CIDRs can use `X-Forwarded-For` or `X-Real-IP`, this should be a reverse proxy.\
+Controls which IP addresses or CIDRs can use `X-Forwarded-For` or `X-Real-IP`, this should be a reverse proxy.\
 Default: `trusted_proxies = ["127.0.0.1", "::1"]`
 
 ## Config [upstream] section
 
-### upstream.mode
+### upstream.mode `string`
 
-`string` Upstream selection mode. Available values: `single`, `random`, `rotated`.
+Upstream selection mode. Available values: `single`, `random`, `rotated`.
 
 *single*: only use your only one upstream or the first one in the list.
 
@@ -88,9 +88,9 @@ Note, interval time is kind of like a minimal gap of the upstream renewal. The t
 
 Default: `mode = "single"`
 
-### upstream.pool
+### upstream.pool `string/string list`
 
-`string/string list` Set one or more upstreams for further selection. Available codenames:
+Set one or more upstreams for further selection. Available codenames:
 
 - `ip-api.com`: very normal option and feel reliable, preferred.\
   Docs: <https://ip-api.com/docs/api:json>
@@ -102,23 +102,23 @@ Default: `mode = "single"`
 Default: `pool = "ip-api.com"`\
 You can also: `pool = ["ip-api.com", "ipinfo-free"]`
 
-### upstream.rotated_interval
+### upstream.rotated_interval `string`
 
-`string` Upstream rotation interval used in `rotated` mode. Parse with go's [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration).
+Upstream rotation interval used in `rotated` mode. Parse with go's [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration).
 
 Default: `rotated_interval = "24h"`\
 You can also: `rotated_interval = "72h99m23s"`
 
 ## Config [domain] section
 
-### domain.enabled
+### domain.enabled `bool`
 
-`bool` Controls whether domain name resolution is permitted.\
+Controls whether domain name resolution is permitted.\
 Default: `enabled = true`
 
-### domain.block_suffix
+### domain.block_suffix `string list`
 
-`string list` Extend the domain public suffix(not only TLD) blocklist used when resolving the domain. You may want to block `lan` TLD here, which it supported by some home routers DHCP server but standard.
+Extend the domain public suffix(not only TLD) blocklist used when resolving the domain. You may want to block `lan` TLD here, which it supported by some home routers DHCP server but standard.
 
 Built-in list is: `"alt", "arpa", "invalid", "local", "localhost", "onion", "test", "internal"`\
 You can also append it: `block_suffix = ["lan"]`
@@ -128,14 +128,14 @@ You can also append it: `block_suffix = ["lan"]`
 > [!WARNING]
 > These entries can not be used in production. Development purpose only.
 
-### dev.debug
+### dev.debug `bool`
 
-`bool` Turn on debug information output(GIN and others).\
+Turn on debug information output(GIN and others).\
 Default: `debug = false`
 
-### dev.log
+### dev.log `bool`
 
-`bool` GIN log, other logs are not affected.\
+GIN log, other logs are not affected.\
 Default: `log = false`
 
 ## License
