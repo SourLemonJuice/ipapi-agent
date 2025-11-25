@@ -66,8 +66,7 @@ Query strings:
 > Note: Request a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).\
 > Even though, many reserved addresses/CIDRs are still not filtered.
 
-If you are querying a reserved domain, it will also return an error. You can extend this list in the config file(at `resolve.block_tld`).\
-Current list: `".alt", ".arpa", ".invalid", ".local", ".localhost", ".onion", ".test", ".internal"`\
+If you are querying a reserved domain, it will also return an error. You can extend this list in the config file(see `[domain]` section).\
 Source: [Special-use domain name - Wikipedia](https://en.wikipedia.org/wiki/Special-use_domain_name)
 
 Consider that some DNS servers will respond with a geolocation-related IP address to reduce CDN's loading time.\
