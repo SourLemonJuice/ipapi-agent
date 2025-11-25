@@ -306,17 +306,15 @@ func getQuery(c *gin.Context) {
 
 // Convert query string that can contain IP address and domain into one safe IP address format.
 // Result won't be: empty string, invalid IP, unresolvable domain.
-func queryToAddr(query string) (string, netip.Addr, error) {
-	var err error
-
+func queryToAddr(query string) (addrStr string, addrIP netip.Addr, err error) {
 	if query == "" {
-		return "", netip.Addr{}, errors.New("empty IP/domain")
+		return "", netip.Addr{}, errors.New("empty query")
 	}
 
 	// query is a real IP address
-	addr, err := netip.ParseAddr(query)
+	addrIP, err = netip.ParseAddr(query)
 	if err == nil {
-		return query, addr, nil
+		return query, addrIP, nil
 	}
 
 	// should we continue parsing?
@@ -325,30 +323,24 @@ func queryToAddr(query string) (string, netip.Addr, error) {
 	}
 
 	// query is a domain name
-	addr, err = resolveDomain(query)
-	if err != nil {
-		return "", netip.Addr{}, err
-	}
-	return query, addr, nil
-}
-
-func resolveDomain(domain string) (netip.Addr, error) {
-	suffix, _ := publicsuffix.PublicSuffix(domain)
+	suffix, _ := publicsuffix.PublicSuffix(query)
 
 	if slices.Contains(conf.Domain.BlockSuffix, suffix) {
-		return netip.Addr{}, errors.New("invalid domain")
+		return "", netip.Addr{}, errors.New("invalid domain")
 	}
 
-	addrStrArr, err := net.LookupHost(domain)
+	addrStrArr, err := net.LookupHost(query)
 	if err != nil {
-		return netip.Addr{}, fmt.Errorf("lookup domain failure: %w", err)
-	}
-	addr, err := netip.ParseAddr(addrStrArr[0])
-	if err != nil {
-		return netip.Addr{}, fmt.Errorf("invalid domain IP address: %w", err)
+		return "", netip.Addr{}, fmt.Errorf("lookup domain failure: %w", err)
 	}
 
-	return addr, nil
+	addrStr = addrStrArr[0]
+	addrIP, err = netip.ParseAddr(addrStr)
+	if err != nil {
+		return "", netip.Addr{}, fmt.Errorf("invalid domain IP address: %w", err)
+	}
+
+	return addrStr, addrIP, nil
 }
 
 // Check if the given IP is one of loopback, private, unspecified(0.0.0.0), or any non-global unicast address.
