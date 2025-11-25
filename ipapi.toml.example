@@ -5,7 +5,7 @@ trusted_proxies = ["127.0.0.1", "::1"]
 
 [upstream]
 mode = "single"
-pool = "ip-api.com"
+pool = "ipinfo-free"
 
 [domain]
 enabled = true

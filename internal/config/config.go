@@ -70,7 +70,7 @@ func New() Config {
 		},
 		Upstream: ConfigUpstream{
 			Mode:            "single",
-			Pool:            []string{"ip-api.com"},
+			Pool:            []string{"ipinfo-free"},
 			RotatedInterval: 24 * time.Hour,
 		},
 		Dev: ConfigDev{

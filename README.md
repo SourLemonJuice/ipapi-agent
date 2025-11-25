@@ -48,6 +48,12 @@ services:
     # command: --config /ipapi.toml
 ```
 
+Or this command:
+
+```sh
+docker run --rm -it -p 8080:8080 -v ./ipapi.toml:/ipapi.toml:ro sourlemonjuice/ipapi-agent:latest
+```
+
 > [!NOTE]
 > This container is CGO disabled and based on Alpine, don't worry about container size :)\
 > Also, after v0.5.0, you can use a sematic tag like `0.5` to reference the latest version of v0.5.* or set to full version `0.5.0`. This replaced old git tag based naming: `v0.4.1`.
@@ -99,7 +105,7 @@ Set one or more upstreams for further selection. Available codenames:
 - `ipapi.co`: free rate limit to 100 requests per month... Added just for fun.\
   Docs: <https://ipapi.co/api/#complete-location>
 
-Default: `pool = "ip-api.com"`\
+Default: `pool = "ipinfo-free"`\
 You can also: `pool = ["ip-api.com", "ipinfo-free"]`
 
 ### upstream.rotated_interval `string`
