@@ -6,7 +6,6 @@ trusted_proxies = ["127.0.0.1", "::1"]
 [upstream]
 mode = "single"
 pool = "ip-api.com"
-rotated_interval = "24h"
 
 [domain]
 enabled = true

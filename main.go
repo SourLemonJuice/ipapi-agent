@@ -142,12 +142,14 @@ func getRoot(c *gin.Context) {
 	query := c.ClientIP()
 	addrStr, addrIP, err := queryToAddr(query)
 	if err != nil {
+		log.Printf("Bad query IP address/domain: %v", err)
 		c.Abort()
 		c.String(http.StatusBadRequest, respTXTFailure(colorful, "Bad query IP address/domain"))
 		return
 	}
 
 	if isSpecialAddr(addrIP) {
+		log.Printf("IP address/domain is in invalid range")
 		c.Abort()
 		c.String(http.StatusBadRequest, respTXTFailure(colorful, "IP address/domain is in invalid range"))
 		return
@@ -166,9 +168,9 @@ func getRoot(c *gin.Context) {
 	apidata := upstream.SelectAPI(conf.Upstream)
 	err = apidata.Request(addrStr)
 	if err != nil {
-		log.Printf("Data source error: %v", err)
+		log.Printf("Upstream error: %v", err)
 		c.Abort()
-		c.String(http.StatusInternalServerError, respTXTFailure(colorful, "Data source error: %v", err))
+		c.String(http.StatusInternalServerError, respTXTFailure(colorful, "Upstream error"))
 		return
 	}
 
@@ -242,14 +244,16 @@ func getQuery(c *gin.Context) {
 
 	addrStr, addrIP, err := queryToAddr(query)
 	if err != nil {
+		log.Printf("Bad query IP address/domain: %v", err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"status":  "failure",
-			"message": "Bad query IP address/domain: " + err.Error(),
+			"message": "Bad query IP address/domain",
 		})
 		return
 	}
 
 	if isSpecialAddr(addrIP) {
+		log.Printf("IP address/domain is in invalid range")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"status":  "failure",
 			"message": "IP address/domain is in invalid range",
@@ -276,10 +280,10 @@ func getQuery(c *gin.Context) {
 	apidata := upstream.SelectAPI(conf.Upstream)
 	err = apidata.Request(addrStr)
 	if err != nil {
-		log.Printf("Data source error: %v", err)
+		log.Printf("Upstream error: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status":  "failure",
-			"message": "Data source error: " + err.Error(),
+			"message": "Upstream error",
 		})
 		return
 	}
