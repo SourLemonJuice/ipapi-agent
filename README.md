@@ -49,7 +49,7 @@ services:
 ```
 
 > [!NOTE]
-> This container is CGO disabled and based on scratch. The package size is very small, but you won't be able to use many utils inside the container for debugging.\
+> This container is CGO disabled and based on Alpine, don't worry about container size :)\
 > Also, after v0.5.0, you can use a sematic tag like `0.5` to reference the latest version of v0.5.* or set to full version `0.5.0`. This replaced old git tag based naming: `v0.4.1`.
 
 ## Config Top-Level section

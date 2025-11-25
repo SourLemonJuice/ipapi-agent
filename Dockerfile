@@ -13,7 +13,7 @@ COPY . .
 ENV GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0
 RUN go build -v -o ipapi-agent .
 
-FROM scratch
+FROM alpine:3.22
 
 LABEL org.opencontainers.image.vendor="酸柠檬猹Char/SourLemonJuice"
 LABEL org.opencontainers.image.authors="SourLemonJuice233@outlook.com"
@@ -23,10 +23,8 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 WORKDIR /
 
-# ipapi-agent required time zone info to work
-COPY --from=build /usr/local/go/lib/time/zoneinfo.zip ./
-COPY --from=build /usr/src/app/ipapi-agent ./
+RUN apk add --no-cache tzdata ca-certificates
 
-ENV ZONEINFO="/zoneinfo.zip"
+COPY --from=build /usr/src/app/ipapi-agent ./
 
 ENTRYPOINT ["/ipapi-agent"]
