@@ -23,8 +23,11 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 WORKDIR /
 
-RUN apk add --no-cache tzdata ca-certificates
+RUN apk add --no-cache tzdata ca-certificates curl
 
 COPY --from=build /usr/src/app/ipapi-agent ./
 
 ENTRYPOINT ["/ipapi-agent"]
+
+HEALTHCHECK --interval=1m --start-period=3s --retries=3 \
+    CMD curl --fail http://localhost:8080/generate_204

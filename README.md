@@ -70,6 +70,9 @@ Default: `listen = "::"`
 Server listening port.\
 Default: `port = 8080`
 
+> [!NOTE]
+> Changing the port in container will break the health check. Leave this unset/default.
+
 ### trusted_proxies `string list`
 
 Controls which IP addresses or CIDRs can use `X-Forwarded-For` or `X-Real-IP`, this should be a reverse proxy.\

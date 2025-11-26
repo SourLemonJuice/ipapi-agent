@@ -83,6 +83,10 @@ func main() {
 	router.GET("/query", getQuery)
 	router.GET("/query/:addr", getQuery)
 
+	router.GET("/generate_204", func(c *gin.Context) {
+		c.Status(http.StatusNoContent)
+	})
+
 	serverAddr := net.JoinHostPort(conf.Listen, strconv.FormatUint(uint64(conf.Port), 10))
 	log.Printf("starting server on %v", serverAddr)
 	err = router.Run(serverAddr)

@@ -75,3 +75,7 @@ If you still feel resolving a domain is dangerous, you can set `resolve.domain =
 ## GET `/query`
 
 Same as above, but request your client IP address.
+
+## GET `/generate_204`
+
+Health check, always return HTTP 204 NO CONTENT.
