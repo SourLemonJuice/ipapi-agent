@@ -9,24 +9,24 @@ import (
 )
 
 var (
-	rotate_codename string
+	rotateCodename string
 )
 
 func InitSelector(conf config.ConfigUpstream) {
 	switch conf.Mode {
-	case "rotate":
+	case config.ModeRotate:
 		go rotate(conf)
 	}
 }
 
 func SelectAPI(conf config.ConfigUpstream) API {
 	switch conf.Mode {
-	case "single":
+	case config.ModeSingle:
 		return New(conf.Pool[0])
-	case "random":
+	case config.ModeRandom:
 		return New(randomCodename(conf.Pool))
-	case "rotate":
-		return New(rotate_codename)
+	case config.ModeRotate:
+		return New(rotateCodename)
 	}
 
 	return nil
@@ -38,8 +38,8 @@ func randomCodename(list []string) string {
 
 func rotate(conf config.ConfigUpstream) {
 	for {
-		rotate_codename = randomCodename(conf.Pool)
-		debug.Logger.Printf("New rotate_codename: %v", rotate_codename)
+		rotateCodename = randomCodename(conf.Pool)
+		debug.Logger.Printf("New rotate_codename: %v", rotateCodename)
 		time.Sleep(conf.RotateInterval)
 	}
 }

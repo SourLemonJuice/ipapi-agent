@@ -18,10 +18,18 @@ type Config struct {
 }
 
 type ConfigUpstream struct {
-	Mode           string        `toml:"mode"`
+	Mode           upstreamMode  `toml:"mode"`
 	Pool           upstreamPool  `toml:"pool"`
 	RotateInterval time.Duration `toml:"rotate_interval"`
 }
+
+type upstreamMode string
+
+const (
+	ModeSingle upstreamMode = "single"
+	ModeRandom upstreamMode = "random"
+	ModeRotate upstreamMode = "rotate"
+)
 
 type upstreamPool []string
 
@@ -103,11 +111,11 @@ func (c *Config) DecodeFile(path string) error {
 
 func (c *Config) validate() error {
 	switch c.Upstream.Mode {
-	case "single":
-	case "random":
-	case "rotate":
+	case ModeSingle:
+	case ModeRandom:
+	case ModeRotate:
 	default:
-		return errors.New("upstream.mode is unknown type")
+		return fmt.Errorf("upstream.mode is unknown type '%v'", c.Upstream.Mode)
 	}
 
 	if c.Upstream.RotateInterval <= 0 {
