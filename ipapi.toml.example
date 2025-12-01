@@ -1,12 +1,15 @@
 listen = "::"
 port = 8080
-# use this list in docker container: ["172.16.0.0/12"]
+# use this list in docker container:
+#trusted_proxies = ["172.16.0.0/12"]
 trusted_proxies = ["127.0.0.1", "::1"]
 
 [upstream]
 mode = "single"
 pool = "ipinfo-free"
+#pool = ["ipinfo-free", "ip-api.com"]
+#rotate_interval = "1h"
 
-[domain]
-enabled = true
-# block_suffix = ["lan"]
+#[domain]
+#enabled = true
+#block_suffix = ["lan"]

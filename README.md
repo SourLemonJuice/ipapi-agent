@@ -88,8 +88,7 @@ Upstream selection mode. Available values: `single`, `random`, `rotated`.
 
 *random*: randomly choice upstream from the upstream list, per-request applied.
 
-*rotated* (broken): keep rotating the upstream from the upstream list. The interval time can be set with `rotated_interval` below.\
-Note, interval time is kind of like a minimal gap of the upstream renewal. The timer will only restarted after a user request.
+*rotate*: keep rotating the upstream from the upstream list. The interval time can be set with `rotate_interval` below.
 
 > [!NOTE]
 > Whatever the mode of selection, the cache system will not be affected at all.\
@@ -111,12 +110,12 @@ Set one or more upstreams for further selection. Available codenames:
 Default: `pool = "ipinfo-free"`\
 You can also: `pool = ["ip-api.com", "ipinfo-free"]`
 
-### upstream.rotated_interval `string`
+### upstream.rotate_interval `string`
 
-Upstream rotation interval used in `rotated` mode. Parse with go's [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration).
+Upstream rotation interval used in `rotate` mode. Parse with go's [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration).
 
-Default: `rotated_interval = "24h"`\
-You can also: `rotated_interval = "72h99m23s"`
+Default: `rotate_interval = "1h"`\
+You can also: `rotate_interval = "72h99m23s"`
 
 ## Config [domain] section
 

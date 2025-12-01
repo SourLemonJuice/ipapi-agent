@@ -18,9 +18,9 @@ type Config struct {
 }
 
 type ConfigUpstream struct {
-	Mode            string        `toml:"mode"`
-	Pool            upstreamPool  `toml:"pool"`
-	RotatedInterval time.Duration `toml:"rotated_interval"`
+	Mode           string        `toml:"mode"`
+	Pool           upstreamPool  `toml:"pool"`
+	RotateInterval time.Duration `toml:"rotate_interval"`
 }
 
 type upstreamPool []string
@@ -69,9 +69,9 @@ func New() Config {
 			BlockSuffix: nil,
 		},
 		Upstream: ConfigUpstream{
-			Mode:            "single",
-			Pool:            []string{"ipinfo-free"},
-			RotatedInterval: 24 * time.Hour,
+			Mode:           "single",
+			Pool:           []string{"ipinfo-free"},
+			RotateInterval: 1 * time.Hour,
 		},
 		Dev: ConfigDev{
 			Debug: false,
@@ -105,14 +105,13 @@ func (c *Config) validate() error {
 	switch c.Upstream.Mode {
 	case "single":
 	case "random":
-	case "rotated":
-		return errors.New("upstream.mode 'rotated' didn't implemented")
+	case "rotate":
 	default:
 		return errors.New("upstream.mode is unknown type")
 	}
 
-	if c.Upstream.RotatedInterval <= 0 {
-		return errors.New("upstream.rotated_interval is in not positive")
+	if c.Upstream.RotateInterval <= 0 {
+		return errors.New("upstream.rotate_interval is in not positive")
 	}
 
 	// block some reserved TLDs
