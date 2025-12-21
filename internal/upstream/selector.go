@@ -1,45 +1,66 @@
 package upstream
 
 import (
+	"fmt"
 	"math/rand/v2"
 	"time"
 
 	"github.com/SourLemonJuice/ipapi-agent/internal/config"
+	C "github.com/SourLemonJuice/ipapi-agent/internal/constant"
 	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
 )
 
 var (
-	rotateCodename string
+	rotateProvider string
 )
+
+func new(provider string) (API, error) {
+	switch provider {
+	case C.UpstreamProviderIpApiCom:
+		return &ipApiCom{}, nil
+	case C.UpstreamProviderIpinfoFree:
+		return &ipinfoFree{}, nil
+	case C.UpstreamProviderIpapiCo:
+		return &ipapiCo{}, nil
+	}
+
+	return nil, fmt.Errorf("unknown upstream provider '%v'", provider)
+}
 
 func InitSelector(conf config.ConfigUpstream) {
 	switch conf.Mode {
-	case config.ModeRotate:
-		go rotate(conf)
+	case C.UpstreamModeRotate:
+		go rotateRunner(conf)
 	}
 }
 
-func SelectAPI(conf config.ConfigUpstream) API {
-	switch conf.Mode {
-	case config.ModeSingle:
-		return New(conf.Pool[0])
-	case config.ModeRandom:
-		return New(randomCodename(conf.Pool))
-	case config.ModeRotate:
-		return New(rotateCodename)
-	}
-
-	return nil
-}
-
-func randomCodename(list []string) string {
-	return list[rand.IntN(len(list))]
-}
-
-func rotate(conf config.ConfigUpstream) {
+func rotateRunner(conf config.ConfigUpstream) {
 	for {
-		rotateCodename = randomCodename(conf.Pool)
-		debug.Logger.Printf("New rotate_codename: %v", rotateCodename)
+		rotateProvider = randomProvider(conf.Pool)
+		debug.Logger.Printf("New rotate_codename: %v", rotateProvider)
 		time.Sleep(conf.RotateInterval)
 	}
+}
+
+func SelectAPI(conf config.ConfigUpstream) (API, error) {
+	prov := ""
+
+	switch conf.Mode {
+	case C.UpstreamModeSingle:
+		prov = conf.Pool[0]
+	case C.UpstreamModeRandom:
+		prov = randomProvider(conf.Pool)
+	case C.UpstreamModeRotate:
+		prov = rotateProvider
+	}
+
+	api, err := new(prov)
+	if err != nil {
+		return nil, err
+	}
+	return api, nil
+}
+
+func randomProvider(list []string) string {
+	return list[rand.IntN(len(list))]
 }

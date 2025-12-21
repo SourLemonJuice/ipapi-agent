@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -17,57 +16,7 @@ type Config struct {
 	Dev            ConfigDev      `toml:"dev"`
 }
 
-type ConfigUpstream struct {
-	Mode           upstreamMode  `toml:"mode"`
-	Pool           upstreamPool  `toml:"pool"`
-	RotateInterval time.Duration `toml:"rotate_interval"`
-}
-
-type upstreamMode string
-
-const (
-	ModeSingle upstreamMode = "single"
-	ModeRandom upstreamMode = "random"
-	ModeRotate upstreamMode = "rotate"
-)
-
-type upstreamPool []string
-
-// accept both a single string or a list of strings
-func (pool *upstreamPool) UnmarshalTOML(raw any) error {
-	valSingle, ok := raw.(string)
-	if ok {
-		*pool = []string{valSingle}
-		return nil
-	}
-
-	valAnyArr, ok := raw.([]any)
-	if ok {
-		*pool = []string{} // init
-		for _, v := range valAnyArr {
-			valStr, ok := v.(string)
-			if !ok {
-				return errors.New("element not string")
-			}
-			*pool = append(*pool, valStr)
-		}
-		return nil
-	}
-
-	return errors.New("unknown value type")
-}
-
-type ConfigDomain struct {
-	Enabled     bool     `toml:"enabled"`
-	BlockSuffix []string `toml:"block_suffix"`
-}
-
-type ConfigDev struct {
-	Debug bool `toml:"debug"`
-	Log   bool `toml:"log"`
-}
-
-func New() Config {
+func Default() Config {
 	return Config{
 		Listen:         "::",
 		Port:           8080,
@@ -109,24 +58,21 @@ func (c *Config) DecodeFile(path string) error {
 	return nil
 }
 
-func (c *Config) validate() error {
-	switch c.Upstream.Mode {
-	case ModeSingle:
-	case ModeRandom:
-	case ModeRotate:
-	default:
-		return fmt.Errorf("upstream.mode is unknown type '%v'", c.Upstream.Mode)
+func (conf *Config) validate() error {
+	err := conf.Upstream.validate()
+	if err != nil {
+		return err
 	}
 
-	if c.Upstream.RotateInterval <= 0 {
-		return errors.New("upstream.rotate_interval is in not positive")
+	err = conf.Domain.validate()
+	if err != nil {
+		return err
 	}
 
-	// block some reserved TLDs
-	// you may want to block .lan TLD with config file, because that's not a part of any standard.
-	// https://en.wikipedia.org/wiki/Special-use_domain_name
-	reservedSuffix := []string{"alt", "arpa", "invalid", "local", "localhost", "onion", "test", "internal"}
-	c.Domain.BlockSuffix = append(c.Domain.BlockSuffix, reservedSuffix...)
+	err = conf.Dev.validate()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

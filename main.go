@@ -105,7 +105,7 @@ func flagVersion(s string) error {
 func findConfig(conf *config.Config, hint string) error {
 	var err error
 
-	*conf = config.New()
+	*conf = config.Default()
 
 	var path string
 	// if no hint use default path
@@ -169,8 +169,12 @@ func getRoot(c *gin.Context) {
 	// let struct cache compatible with getQuery()
 	resp.Status = "success"
 
-	apidata := upstream.SelectAPI(conf.Upstream)
-	err = apidata.Request(addrStr)
+	api, err := upstream.SelectAPI(conf.Upstream)
+	if err != nil {
+		log.Fatalf("Can't select API: %v", err)
+	}
+
+	err = api.Request(addrStr)
 	if err != nil {
 		log.Printf("Upstream error: %v", err)
 		c.Abort()
@@ -178,7 +182,7 @@ func getRoot(c *gin.Context) {
 		return
 	}
 
-	err = apidata.Fill(&resp)
+	err = api.Fill(&resp)
 	if err != nil {
 		log.Printf("Internal Server Error: %v", err)
 		c.Abort()
@@ -281,8 +285,12 @@ func getQuery(c *gin.Context) {
 
 	resp.Status = "success"
 
-	apidata := upstream.SelectAPI(conf.Upstream)
-	err = apidata.Request(addrStr)
+	api, err := upstream.SelectAPI(conf.Upstream)
+	if err != nil {
+		log.Fatalf("Can't select API: %v", err)
+	}
+
+	err = api.Request(addrStr)
 	if err != nil {
 		log.Printf("Upstream error: %v", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -292,7 +300,7 @@ func getQuery(c *gin.Context) {
 		return
 	}
 
-	err = apidata.Fill(&resp)
+	err = api.Fill(&resp)
 	if err != nil {
 		log.Printf("Internal Server Error: %v", err)
 		// for security reasons, it won't response error string
