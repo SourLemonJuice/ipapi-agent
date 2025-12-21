@@ -56,6 +56,7 @@ Response JSON:
 |org|Organization name|`"Sky Broadband"`|string|
 |isp|Internet service provider(ISP) name|`"Sky UK Limited"`|string|
 |asn|Autonomous System Number|`"AS5607"`|string|
+|anycast|Anycast info, only available when using `ipinfo-free`|`true`|bool|
 
 Query strings:
 

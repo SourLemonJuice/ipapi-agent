@@ -74,7 +74,7 @@ func (data *ipapiCo) Fill(resp *response.Query) error {
 	}
 
 	resp.Org = data.Org
-	resp.ISP = ""
+	resp.ISP = resp.Org
 	resp.ASN = data.ASN
 
 	return nil

@@ -32,7 +32,7 @@ type ipinfoFree struct {
 	Country  string `json:"country"`
 	Org      string `json:"org"`
 	Timezone string `json:"timezone"`
-	Anycast  bool   `json:"anycast"` // TODO try to display it
+	Anycast  bool   `json:"anycast"`
 }
 
 func (data *ipinfoFree) Request(addr string) error {
@@ -68,7 +68,8 @@ func (data *ipinfoFree) Fill(resp *response.Query) error {
 	}
 	resp.ASN = before
 	resp.Org = after
-	resp.ISP = ""
+	resp.ISP = resp.Org
+	resp.Anycast = data.Anycast
 
 	return nil
 }

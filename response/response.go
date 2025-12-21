@@ -12,4 +12,5 @@ type Query struct {
 	Org         string `json:"org"`
 	ISP         string `json:"isp"` // when no ISP data available, set to empty string
 	ASN         string `json:"asn"`
+	Anycast     bool   `json:"anycast,omitempty"` // only ipinfo-free can provided anycast info
 }
