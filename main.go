@@ -214,29 +214,35 @@ func respTXTFailure(colorful bool, format string, obj ...any) string {
 func respTXT(colorful bool, addrStr string, resp response.Query) string {
 	var txt strings.Builder
 	cGreen := color.New(color.FgHiGreen)
+	cYellow := color.New(color.FgHiYellow, color.Bold)
 	if !colorful {
 		cGreen.DisableColor()
+		cYellow.DisableColor()
 	}
 
 	// U+25CF Black Circle: ●
 	// from systemctl status ^_^
 	txt.WriteString(cGreen.Sprint("\u25cf"))
-	txt.WriteString(fmt.Sprintf(" %v - %v\r\n", addrStr, resp.DataSource))
+	txt.WriteString(fmt.Sprintf(" %v", addrStr))
+	if resp.Anycast {
+		txt.WriteString(cYellow.Sprint(" (Anycast)"))
+	}
+	txt.WriteString(fmt.Sprintf(" - %v\r\n", resp.DataSource))
 
-	tab := tabwriter.NewWriter(&txt, 0, 0, 0, ' ', tabwriter.AlignRight)
-	fmt.Fprintf(tab, "Location: \t%v, %v (%v)\r\n", resp.Region, resp.Country, resp.CountryCode)
-	fmt.Fprintf(tab, "Timezone: \t%v %v\r\n", resp.Timezone, utcOffsetToISO8601(resp.UTCOffset))
+	tab := tabwriter.NewWriter(&txt, 2, 0, 0, ' ', tabwriter.AlignRight)
+	fmt.Fprintf(tab, "\tLocation: \t%v, %v (%v)\r\n", resp.Region, resp.Country, resp.CountryCode)
+	fmt.Fprintf(tab, "\tTimezone: \t%v %v\r\n", resp.Timezone, utcOffsetToISO8601(resp.UTCOffset))
 
 	if len(resp.Org) == 0 {
-		fmt.Fprintf(tab, "Org: \t<Unavailable>\r\n")
+		fmt.Fprintf(tab, "\tOrg: \t<Unavailable>\r\n")
 	} else {
-		fmt.Fprintf(tab, "Org: \t%v\r\n", resp.Org)
+		fmt.Fprintf(tab, "\tOrg: \t%v\r\n", resp.Org)
 	}
 	if len(resp.ISP) > 0 {
-		fmt.Fprintf(tab, "ISP: \t%v\r\n", resp.ISP)
+		fmt.Fprintf(tab, "\tISP: \t%v\r\n", resp.ISP)
 	}
 
-	fmt.Fprintf(tab, "ASN: \t%v\r\n", resp.ASN)
+	fmt.Fprintf(tab, "\tASN: \t%v\r\n", resp.ASN)
 	tab.Flush()
 
 	return txt.String()
