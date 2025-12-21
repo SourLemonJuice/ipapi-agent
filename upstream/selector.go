@@ -5,9 +5,9 @@ import (
 	"math/rand/v2"
 	"time"
 
-	"github.com/SourLemonJuice/ipapi-agent/internal/config"
-	C "github.com/SourLemonJuice/ipapi-agent/internal/constant"
-	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
+	"github.com/SourLemonJuice/ipapi-agent/config"
+	C "github.com/SourLemonJuice/ipapi-agent/constant"
+	"github.com/SourLemonJuice/ipapi-agent/debug"
 )
 
 var (

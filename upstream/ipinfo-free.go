@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SourLemonJuice/ipapi-agent/internal/response"
+	"github.com/SourLemonJuice/ipapi-agent/response"
 	"github.com/biter777/countries"
 )
 

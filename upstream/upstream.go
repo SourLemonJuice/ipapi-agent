@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SourLemonJuice/ipapi-agent/internal/response"
+	"github.com/SourLemonJuice/ipapi-agent/response"
 )
 
 type API interface {

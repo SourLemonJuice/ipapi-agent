@@ -20,11 +20,11 @@ import (
 	"github.com/patrickmn/go-cache"
 	"golang.org/x/net/publicsuffix"
 
-	"github.com/SourLemonJuice/ipapi-agent/internal/build"
-	"github.com/SourLemonJuice/ipapi-agent/internal/config"
-	"github.com/SourLemonJuice/ipapi-agent/internal/debug"
-	"github.com/SourLemonJuice/ipapi-agent/internal/response"
-	"github.com/SourLemonJuice/ipapi-agent/internal/upstream"
+	"github.com/SourLemonJuice/ipapi-agent/build"
+	"github.com/SourLemonJuice/ipapi-agent/config"
+	"github.com/SourLemonJuice/ipapi-agent/debug"
+	"github.com/SourLemonJuice/ipapi-agent/response"
+	"github.com/SourLemonJuice/ipapi-agent/upstream"
 )
 
 var (

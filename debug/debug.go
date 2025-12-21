@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/SourLemonJuice/ipapi-agent/internal/build"
+	"github.com/SourLemonJuice/ipapi-agent/build"
 	"github.com/fatih/color"
 )
 

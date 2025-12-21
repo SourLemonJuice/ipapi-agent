@@ -3,7 +3,7 @@ package upstream
 import (
 	"fmt"
 
-	"github.com/SourLemonJuice/ipapi-agent/internal/response"
+	"github.com/SourLemonJuice/ipapi-agent/response"
 )
 
 /*

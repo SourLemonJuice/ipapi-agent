@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	C "github.com/SourLemonJuice/ipapi-agent/internal/constant"
+	C "github.com/SourLemonJuice/ipapi-agent/constant"
 )
 
 type ConfigUpstream struct {
