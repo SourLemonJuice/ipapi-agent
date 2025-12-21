@@ -37,7 +37,7 @@ func InitSelector(conf config.ConfigUpstream) {
 func rotateRunner(conf config.ConfigUpstream) {
 	for {
 		rotateProvider = randomProvider(conf.Pool)
-		debug.Logger.Printf("New rotate_codename: %v", rotateProvider)
+		debug.Logger.Printf("New rotateProvider: %v", rotateProvider)
 		time.Sleep(conf.RotateInterval)
 	}
 }

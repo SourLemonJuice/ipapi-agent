@@ -13,7 +13,7 @@ COPY . .
 ENV GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0
 RUN go build -v -o ipapi-agent .
 
-FROM alpine:3.22
+FROM alpine:3.23
 
 LABEL org.opencontainers.image.vendor="酸柠檬猹Char/SourLemonJuice"
 LABEL org.opencontainers.image.authors="SourLemonJuice233@outlook.com"
