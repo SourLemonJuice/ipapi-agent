@@ -2,8 +2,8 @@
 
 ## GET `/`
 
-Respond with plain text in a human-friendly format.\
-The content of the response is uncertain, you should not use this endpoint in your script.
+Respond with plain text in a human-friendly format. The request IP address is your client address.\
+The content of the response is uncertain, you should not use this endpoint in your automation script.
 
 The content of the response is almost a variant of [`/query/<IP addr or domain>`](#get-queryip-addr-or-domain), but queries the client IP address.\
 Its limitations also apply.
@@ -38,6 +38,10 @@ curl -H 'X-Real-IP: 1.1.1.1' localhost:8080
 
 After v0.2.0, if the user agent of the client is `curl`, some ANSI color codes will be added. \awa/\
 I copied those ideas from systemd, haha.
+
+## GET `/<IP addr or domain>`
+
+Same as `/`, but responded with your given IP address.
 
 ## GET `/query/<IP addr or domain>`
 
@@ -75,7 +79,7 @@ If you still feel resolving a domain is dangerous, you can set `resolve.domain =
 
 ## GET `/query`
 
-Same as above, but request your client IP address.
+Same as above, but responded with your client IP address.
 
 ## GET `/generate_204`
 

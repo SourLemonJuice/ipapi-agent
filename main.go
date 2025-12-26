@@ -81,6 +81,7 @@ func main() {
 	}
 
 	router.GET("/", getRoot)
+	router.GET("/:addr", getRoot)
 	router.GET("/query", getQuery)
 	router.GET("/query/:addr", getQuery)
 
@@ -144,7 +145,11 @@ func getRoot(ctx *gin.Context) {
 		colorful = true
 	}
 
-	query := ctx.ClientIP()
+	query := ctx.Param("addr")
+	if query == "" {
+		query = ctx.ClientIP()
+	}
+
 	addrStr, err := parseQuery(query)
 	if err != nil {
 		log.Printf("Bad IP address/domain: %v", err)

@@ -8,7 +8,8 @@ View the IP country/region and ASN in a JSON or plain text format.
 Try our human interface via curl:
 
 ```sh
-curl https://ip.charchar.dev
+curl ip.charchar.dev
+curl ip.charchar.dev/1.1.1.1
 ```
 
 Or check out the full REST api reference(include details of the human interface): [docs/api-reference.md](docs/api-reference.md)
@@ -44,8 +45,6 @@ services:
       - 8080:8080
     volumes:
       - ./ipapi.toml:/ipapi.toml:ro
-    # set config file path, if needed
-    # command: --config /ipapi.toml
 ```
 
 Or this command:
