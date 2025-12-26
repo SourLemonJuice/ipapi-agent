@@ -73,3 +73,36 @@ func (data *ipinfoFree) Fill(resp *response.Query) error {
 
 	return nil
 }
+
+func (data *ipinfoFree) Fetch(addr string) (resp response.Query, err error) {
+	err = getJSON(fmt.Sprintf("https://ipinfo.io/%v/json", addr), data)
+	if err != nil {
+		return resp, err
+	}
+
+	resp.DataSource = "IPinfo Free"
+	resp.CountryCode = data.Country
+	resp.Region = data.Region
+
+	country := countries.ByName(data.Country)
+	resp.Country = country.Info().Name
+
+	resp.Timezone = data.Timezone
+	resp.UTCOffset, err = timezoneToUTCOffset(data.Timezone)
+	if err != nil {
+		return resp, fmt.Errorf("can not convert UTC offset: %w", err)
+	}
+
+	// split the first space, first part is ASN, second is Org and ISP:
+	// "AS13335 Cloudflare, Inc."
+	before, after, found := strings.Cut(data.Org, " ")
+	if !found {
+		return resp, errors.New("wrong organization format of IPinfo Free")
+	}
+	resp.ASN = before
+	resp.Org = after
+	resp.ISP = resp.Org
+	resp.Anycast = data.Anycast
+
+	return resp, nil
+}

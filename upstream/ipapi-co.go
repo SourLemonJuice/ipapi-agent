@@ -49,17 +49,11 @@ type ipapiCo struct {
 	Org         string `json:"org"`
 }
 
-func (data *ipapiCo) Request(addr string) error {
-	err := getJSON(fmt.Sprintf("https://ipapi.co/%v/json/", addr), data)
+func (data *ipapiCo) Fetch(addr string) (resp response.Query, err error) {
+	err = getJSON(fmt.Sprintf("https://ipapi.co/%v/json/", addr), data)
 	if err != nil {
-		return err
+		return resp, err
 	}
-
-	return nil
-}
-
-func (data *ipapiCo) Fill(resp *response.Query) error {
-	var err error
 
 	resp.DataSource = "ipapi.co"
 	resp.Country = data.CountryName
@@ -67,15 +61,14 @@ func (data *ipapiCo) Fill(resp *response.Query) error {
 	resp.Region = data.Region
 	resp.Timezone = data.Timezone
 
-	// UTCOffset
 	resp.UTCOffset, err = timezoneToUTCOffset(data.Timezone)
 	if err != nil {
-		return fmt.Errorf("can not convert UTC offset: %w", err)
+		return resp, fmt.Errorf("can not convert UTC offset: %w", err)
 	}
 
 	resp.Org = data.Org
 	resp.ISP = resp.Org
 	resp.ASN = data.ASN
 
-	return nil
+	return resp, nil
 }

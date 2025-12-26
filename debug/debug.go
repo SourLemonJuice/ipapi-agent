@@ -12,7 +12,7 @@ import (
 
 var (
 	// set the flag other than 0 may cause some performance issue
-	Logger *log.Logger = log.New(io.Discard, "[DEBUG] ", 0)
+	Logger *log.Logger = log.New(io.Discard, "[debug] ", 0)
 )
 
 func Enable() {

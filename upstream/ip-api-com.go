@@ -35,26 +35,20 @@ type ipApiCom struct {
 	AS          string `json:"as"`
 }
 
-func (data *ipApiCom) Request(addr string) error {
-	err := getJSON(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr), data)
+func (data *ipApiCom) Fetch(addr string) (resp response.Query, err error) {
+	err = getJSON(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr), data)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	switch data.Status {
 	case "success":
 	case "fail":
-		return fmt.Errorf("response error: %v", data.Message)
+		return resp, fmt.Errorf("response error: %v", data.Message)
 	default:
 		// for security considered, the undefined status shouldn't be returned
-		return errors.New("unknown response status")
+		return resp, errors.New("unknown response status")
 	}
-
-	return nil
-}
-
-func (data *ipApiCom) Fill(resp *response.Query) error {
-	var err error
 
 	resp.DataSource = "ip-api.com"
 	resp.Country = data.Country
@@ -64,17 +58,17 @@ func (data *ipApiCom) Fill(resp *response.Query) error {
 
 	resp.UTCOffset, err = timezoneToUTCOffset(data.Timezone)
 	if err != nil {
-		return fmt.Errorf("can not convert UTC offset: %w", err)
+		return resp, fmt.Errorf("can not convert UTC offset: %w", err)
 	}
 
 	resp.Org = data.Org
 	resp.ISP = data.ISP
 	resp.ASN, err = data.getASN()
 	if err != nil {
-		return fmt.Errorf("can not convert ASN: %w", err)
+		return resp, fmt.Errorf("can not convert ASN: %w", err)
 	}
 
-	return nil
+	return resp, nil
 }
 
 func (data *ipApiCom) getASN() (string, error) {

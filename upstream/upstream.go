@@ -10,12 +10,9 @@ import (
 )
 
 type API interface {
-	// Prepare data for the next use.
-	// If failure, response InternalServerError with JSON message.
-	Request(addr string) error
-	// Fill data into the given struct. This won't fill "status" and "message".
+	// Request the upstream API and return a Query structure without "status" and "message" filed.
 	// If failure, response InternalServerError.
-	Fill(resp *response.Query) error
+	Fetch(addr string) (response.Query, error)
 }
 
 func getJSON(url string, data API) error {
