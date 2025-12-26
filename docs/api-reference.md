@@ -13,12 +13,12 @@ This endpoint shares the query cache with [`/query/<IP addr or domain>`](#get-qu
 For example:
 
 ```text
-● 1.1.1.1 | ip-api.com
- Location: Queensland, Australia (AU)
- Timezone: Australia/Brisbane UTC+1000
-      ISP: Cloudflare, Inc
-      Org: APNIC and Cloudflare DNS Resolver project
-      ASN: AS13335
+● 1.1.1.1 (Anycast) - IPinfo Free
+  Location: Hong Kong, Hong Kong (Special Administrative Region of China) (HK)
+  Timezone: Asia/Hong_Kong UTC+0800
+       Org: Cloudflare, Inc.
+       ISP: Cloudflare, Inc.
+       ASN: AS13335
 ```
 
 Or this:
@@ -31,9 +31,9 @@ IP address/domain is in invalid range
 Try it with curl:
 
 ```shell
-curl https://ip.charchar.dev
-# or request a fake client IP via X-Real-IP, as long as you are in the trusted_proxies list
-curl -H 'X-Real-IP: 1.1.1.1' localhost:8080
+curl ip.charchar.dev
+# or request a fake client IP via X-Forwarded-For, as long as you are in the trusted_proxies list
+curl -H 'X-Forwarded-For: 1.1.1.1' localhost:8080
 ```
 
 After v0.2.0, if the user agent of the client is `curl`, some ANSI color codes will be added. \awa/\
@@ -51,7 +51,7 @@ Response JSON:
 |--|--|--|--|
 |status|`success` or `failure`|`"success"`|string|
 |message|User-friendly message, **ONLY exists** when failure state. Uncertain content|`"Data source error"`|string|
-|dataSource|One of upstream data providers: `ip-api.com`|`"ip-api.com"`|string|
+|dataSource|One of upstream data providers: `ipinfo-free`, `ip-api.com`, `ipapi.co`|`"ipinfo-free"`|string|
 |country|Country common name|`"United Kingdom"`|string|
 |countryCode|ISO 3166 Country two-letters code|`"GB"`|string|
 |region|Region name|`"England"`|string|
