@@ -1,6 +1,7 @@
 package upstream
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/SourLemonJuice/ipapi-agent/response"
@@ -49,8 +50,8 @@ type ipapiCo struct {
 	Org         string `json:"org"`
 }
 
-func (data *ipapiCo) Fetch(addr string) (resp response.Query, err error) {
-	err = getJSON(fmt.Sprintf("https://ipapi.co/%v/json/", addr), data)
+func (data *ipapiCo) Fetch(ctx context.Context, addr string) (resp response.Query, err error) {
+	err = fetchJSON(ctx, fmt.Sprintf("https://ipapi.co/%v/json/", addr), data)
 	if err != nil {
 		return resp, err
 	}

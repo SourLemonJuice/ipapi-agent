@@ -133,7 +133,7 @@ You can also append it: `block_suffix = ["lan"]`
 ## Config [dev] section
 
 > [!WARNING]
-> These entries can not be used in production. Development purpose only.
+> Development only
 
 ### dev.debug `bool`
 
@@ -144,6 +144,12 @@ Default: `debug = false`
 
 GIN log, other logs are not affected.\
 Default: `log = false`
+
+### dev.upstream_timeout `string`
+
+Use `time.Duration` format.
+
+Default: `upstream_timeout = "3s"`
 
 ## License
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -42,15 +43,13 @@ func init() {
 }
 
 func main() {
-	var err error
-
 	flag.BoolFunc("version", "print version information of ipapi-agent", flagVersion)
 	confPath := flag.String("config", "", "set config file path")
 	flag.Parse()
 
 	log.Print("initializing...")
 
-	err = findConfig(&conf, *confPath)
+	err := findConfig(&conf, *confPath)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -105,8 +104,6 @@ func flagVersion(s string) error {
 }
 
 func findConfig(conf *config.Config, hint string) error {
-	var err error
-
 	*conf = config.Default()
 
 	var path string
@@ -124,7 +121,7 @@ func findConfig(conf *config.Config, hint string) error {
 	// if no any file found, only default value will be applied.
 	if len(path) != 0 {
 		log.Printf("loading config file %v", path)
-		err = conf.DecodeFile(path)
+		err := conf.DecodeFile(path)
 		if err != nil {
 			return fmt.Errorf("can't load config file: %w", err)
 		}
@@ -135,49 +132,51 @@ func findConfig(conf *config.Config, hint string) error {
 	return nil
 }
 
-func getRoot(ctx *gin.Context) {
+func getRoot(c *gin.Context) {
 	// Use \r\n (CRLF) as line break symbol in this function, which it is Windows and HTTP format.
 	// Also, don't forget the last line break at the body end.
-	var err error
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), conf.Dev.UpstreamTimeout)
+	defer cancel()
 
 	colorful := false
-	if strings.HasPrefix(ctx.GetHeader("User-Agent"), "curl") {
+	if strings.HasPrefix(c.GetHeader("User-Agent"), "curl") {
 		colorful = true
 	}
 
-	query := ctx.Param("addr")
+	query := c.Param("addr")
 	if query == "" {
-		query = ctx.ClientIP()
+		query = c.ClientIP()
 	}
 
 	addrStr, err := parseQuery(query)
 	if err != nil {
 		log.Printf("Bad IP address/domain: %v", err)
-		ctx.Abort()
-		ctx.String(http.StatusBadRequest, respTXTFailure(colorful, "Bad IP address/domain"))
+		c.Abort()
+		c.String(http.StatusBadRequest, respTXTFailure(colorful, "Bad IP address/domain"))
 		return
 	}
 
 	var resp response.Query
 	if val, found := queryCache.Get(addrStr); found {
 		resp = val.(response.Query)
-		ctx.String(http.StatusOK, respTXT(colorful, addrStr, resp))
+		c.String(http.StatusOK, respTXT(colorful, addrStr, resp))
 		return
 	}
 
 	api, err := upstream.SelectAPI(conf.Upstream)
 	if err != nil {
 		log.Fatalf("Can't select API: %v", err)
-		ctx.Abort()
-		ctx.String(http.StatusInternalServerError, respTXTFailure(colorful, "Internal Server Error"))
+		c.Abort()
+		c.String(http.StatusInternalServerError, respTXTFailure(colorful, "Internal Server Error"))
 		return
 	}
 
-	resp, err = api.Fetch(addrStr)
+	resp, err = api.Fetch(ctx, addrStr)
 	if err != nil {
 		log.Printf("Upstream error: %v", err)
-		ctx.Abort()
-		ctx.String(http.StatusInternalServerError, respTXTFailure(colorful, "Upstream error"))
+		c.Abort()
+		c.String(http.StatusInternalServerError, respTXTFailure(colorful, "Upstream error"))
 		return
 	}
 
@@ -186,7 +185,7 @@ func getRoot(ctx *gin.Context) {
 
 	queryCache.SetDefault(addrStr, resp)
 
-	ctx.String(http.StatusOK, respTXT(colorful, addrStr, resp))
+	c.String(http.StatusOK, respTXT(colorful, addrStr, resp))
 }
 
 func respTXTFailure(colorful bool, format string, obj ...any) string {
@@ -242,27 +241,28 @@ func respTXT(colorful bool, addrStr string, resp response.Query) string {
 	return txt.String()
 }
 
-func getQuery(ctx *gin.Context) {
-	var err error
+func getQuery(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), conf.Dev.UpstreamTimeout)
+	defer cancel()
 
-	query := ctx.Param("addr")
+	query := c.Param("addr")
 	if query == "" {
-		query = ctx.ClientIP()
+		query = c.ClientIP()
 	}
 
 	addrStr, err := parseQuery(query)
 	if err != nil {
 		log.Printf("Bad IP address/domain: %v", err)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"status":  C.ResponseStatusFailure,
 			"message": "Bad IP address/domain",
 		})
 		return
 	}
 
-	useCache, err := strconv.ParseBool(ctx.DefaultQuery("cache", "true"))
+	useCache, err := strconv.ParseBool(c.DefaultQuery("cache", "true"))
 	if err != nil {
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
@@ -270,21 +270,21 @@ func getQuery(ctx *gin.Context) {
 	// love cache ^_^
 	if val, found := queryCache.Get(addrStr); found && useCache {
 		resp = val.(response.Query)
-		ctx.JSON(http.StatusOK, resp)
+		c.JSON(http.StatusOK, resp)
 		return
 	}
 
 	api, err := upstream.SelectAPI(conf.Upstream)
 	if err != nil {
 		log.Fatalf("Can't select API: %v", err)
-		ctx.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	resp, err = api.Fetch(addrStr)
+	resp, err = api.Fetch(ctx, addrStr)
 	if err != nil {
 		log.Printf("Upstream error: %v", err)
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status":  C.ResponseStatusFailure,
 			"message": "Upstream error",
 		})
@@ -295,7 +295,7 @@ func getQuery(ctx *gin.Context) {
 
 	queryCache.SetDefault(addrStr, resp)
 
-	ctx.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, resp)
 }
 
 // Convert query string that can contain IP address and domain into one safe IP address format.

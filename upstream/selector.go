@@ -30,15 +30,13 @@ func new(provider string) (API, error) {
 func InitSelector(conf config.ConfigUpstream) {
 	switch conf.Mode {
 	case C.UpstreamModeRotate:
-		go rotateRunner(conf)
-	}
-}
-
-func rotateRunner(conf config.ConfigUpstream) {
-	for {
-		rotateProvider = randomProvider(conf.Pool)
-		debug.Logger.Printf("New rotateProvider: %v", rotateProvider)
-		time.Sleep(conf.RotateInterval)
+		go func() {
+			for {
+				rotateProvider = randomProvider(conf.Pool)
+				debug.Logger.Printf("New rotateProvider: %v", rotateProvider)
+				time.Sleep(conf.RotateInterval)
+			}
+		}()
 	}
 }
 

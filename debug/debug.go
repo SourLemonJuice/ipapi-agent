@@ -23,5 +23,6 @@ func PrintIntro() {
 	fmt.Println("======Version======")
 	build.PrintVersion()
 	fmt.Println("======End Version======")
-	Logger.Printf("has NoColor flag: %v\n", color.NoColor)
+	Logger.Printf("Has NoColor flag: %v\n", color.NoColor)
+	fmt.Println("======End Debug======")
 }

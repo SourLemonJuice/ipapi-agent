@@ -1,6 +1,7 @@
 package upstream
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,17 +13,20 @@ import (
 type API interface {
 	// Request the upstream API and return a Query structure without "status" and "message" filed.
 	// If failure, response InternalServerError.
-	Fetch(addr string) (response.Query, error)
+	Fetch(ctx context.Context, addr string) (response.Query, error)
 }
 
-func getJSON(url string, data API) error {
-	var err error
-
-	resp, err := http.Get(url)
+func fetchJSON(ctx context.Context, url string, data API) error {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return fmt.Errorf("HTTP request error: %w", err)
+		return err
 	}
-	defer resp.Body.Close()
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("HTTP request error: %v", err)
+	}
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("response is not 200 OK: %v", resp.Status)
@@ -37,8 +41,6 @@ func getJSON(url string, data API) error {
 }
 
 func timezoneToUTCOffset(tzStr string) (int, error) {
-	var err error
-
 	tz, err := time.LoadLocation(tzStr)
 	if err != nil {
 		return 0, fmt.Errorf("can not load timezone: %w", err)

@@ -1,6 +1,7 @@
 package upstream
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -35,8 +36,8 @@ type ipApiCom struct {
 	AS          string `json:"as"`
 }
 
-func (data *ipApiCom) Fetch(addr string) (resp response.Query, err error) {
-	err = getJSON(fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr), data)
+func (data *ipApiCom) Fetch(ctx context.Context, addr string) (resp response.Query, err error) {
+	err = fetchJSON(ctx, fmt.Sprintf("http://ip-api.com/json/%v?fields=53003", addr), data)
 	if err != nil {
 		return resp, err
 	}

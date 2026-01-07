@@ -16,6 +16,7 @@ type Config struct {
 	Dev            ConfigDev      `toml:"dev"`
 }
 
+// TODO move default values to separate source file
 func Default() Config {
 	return Config{
 		Listen:         "::",
@@ -31,8 +32,9 @@ func Default() Config {
 			RotateInterval: 1 * time.Hour,
 		},
 		Dev: ConfigDev{
-			Debug: false,
-			Log:   false,
+			Debug:           false,
+			Log:             false,
+			UpstreamTimeout: 3 * time.Second,
 		},
 	}
 }
