@@ -5,6 +5,11 @@ type ConfigDomain struct {
 	BlockSuffix []string `toml:"block_suffix"`
 }
 
+var DefaultDomain = ConfigDomain{
+	Enabled:     true,
+	BlockSuffix: nil,
+}
+
 func (domain *ConfigDomain) validate() error {
 	// block some reserved TLDs
 	// you may want to block .lan TLD with config file, because that's not a part of any standard.

@@ -40,6 +40,12 @@ func (pool *upstreamPool) UnmarshalTOML(raw any) error {
 	return errors.New("unknown value type")
 }
 
+var DefaultUpstream = ConfigUpstream{
+	Mode:           "single",
+	Pool:           []string{"ipinfo-free"},
+	RotateInterval: 1 * time.Hour,
+}
+
 func (upstream *ConfigUpstream) validate() error {
 	switch upstream.Mode {
 	case C.UpstreamModeSingle:

@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/BurntSushi/toml"
 )
@@ -16,26 +15,14 @@ type Config struct {
 	Dev            ConfigDev      `toml:"dev"`
 }
 
-// TODO move default values to separate source file
 func Default() Config {
 	return Config{
 		Listen:         "::",
 		Port:           8080,
 		TrustedProxies: []string{"127.0.0.1", "::1"},
-		Domain: ConfigDomain{
-			Enabled:     true,
-			BlockSuffix: nil,
-		},
-		Upstream: ConfigUpstream{
-			Mode:           "single",
-			Pool:           []string{"ipinfo-free"},
-			RotateInterval: 1 * time.Hour,
-		},
-		Dev: ConfigDev{
-			Debug:           false,
-			Log:             false,
-			UpstreamTimeout: 3 * time.Second,
-		},
+		Domain:         DefaultDomain,
+		Upstream:       DefaultUpstream,
+		Dev:            DefaultDev,
 	}
 }
 
