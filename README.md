@@ -30,8 +30,8 @@ The GitHub CI will automatically build and push the amd64/arm64/riscv64 containe
 
 | Registry | URL |
 | --- | --- |
-|Docker Hub|[sourlemonjuice/ipapi-agent](https://hub.docker.com/r/sourlemonjuice/ipapi-agent)|
-|GitHub Container Registry|[ghcr.io/sourlemonjuice/ipapi-agent](https://github.com/SourLemonJuice/ipapi-agent/pkgs/container/ipapi-agent)|
+| Docker Hub | [sourlemonjuice/ipapi-agent](https://hub.docker.com/r/sourlemonjuice/ipapi-agent) |
+| GitHub Container Registry | [ghcr.io/sourlemonjuice/ipapi-agent](https://github.com/SourLemonJuice/ipapi-agent/pkgs/container/ipapi-agent) |
 
 The example Docker Compose file:
 
@@ -148,4 +148,4 @@ Default: `log = false`
 ## License
 
 This software published under Apache-2.0 license.\
-Copyright 2025 酸柠檬猹/SourLemonJuice
+Copyright 2025-2026 酸柠檬猹/SourLemonJuice

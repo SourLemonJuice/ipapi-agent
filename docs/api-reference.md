@@ -47,26 +47,26 @@ Same as `/`, but responded with your given IP address.
 
 Response JSON:
 
-|Name|Description|Example|Type|
-|--|--|--|--|
-|status|`success` or `failure`|`"success"`|string|
-|message|User-friendly message, **ONLY exists** when failure state. Uncertain content|`"Data source error"`|string|
-|dataSource|One of upstream data providers: `ipinfo-free`, `ip-api.com`, `ipapi.co`|`"ipinfo-free"`|string|
-|country|Country common name|`"United Kingdom"`|string|
-|countryCode|ISO 3166 Country two-letters code|`"GB"`|string|
-|region|Region name|`"England"`|string|
-|timezone|Timezone information|`"Europe/London"`|string|
-|utcOffset|Kind like [getTimezoneOffset()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset) but result "UTC+" with positive "UTC-" with negative. Unit is minutes|`480`(UTC+8)|int|
-|org|Organization name|`"Sky Broadband"`|string|
-|isp|Internet service provider(ISP) name|`"Sky UK Limited"`|string|
-|asn|Autonomous System Number|`"AS5607"`|string|
-|anycast|Anycast info, only available when using `ipinfo-free`|`true`|bool|
+| Name | Description | Example | Type |
+| --- | --- | --- | --- |
+| status | `success` or `failure` | `"success"` | string |
+| message | User-friendly message, **ONLY exists** when failure state. Uncertain content | `"Data source error"` | string |
+| dataSource | One of upstream data providers: `ipinfo-free`, `ip-api.com`, `ipapi.co` | `"ipinfo-free"` | string |
+| country | Country common name | `"United Kingdom"` | string |
+| countryCode | ISO 3166 Country two-letters code | `"GB"` | string |
+| region | Region name | `"England"` | string |
+| timezone | Timezone information | `"Europe/London"` | string |
+| utcOffset | Kind like [getTimezoneOffset()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset) but result "UTC+" with positive "UTC-" with negative. Unit is minutes | `480`(UTC+8) | int |
+| org | Organization name | `"Sky Broadband"` | string |
+| isp | Internet service provider(ISP) name | `"Sky UK Limited"` | string |
+| asn | Autonomous System Number | `"AS5607"` | string |
+| anycast | Anycast info, only available when using `ipinfo-free` | `true` | bool |
 
 Query strings:
 
-|Name|Description|Example|Value Range|
-|--|--|--|--|
-|cache|Force control whether the server uses its cache|`cache=false`|`true` or `false`|
+| Name | Description | Example | Type |
+| --- | --- | --- | --- |
+| cache | Force control whether the server uses its cache | `cache=false` | bool |
 
 > Note: Request a loopback, private, unspecified(0.0.0.0/::), or any non-global unicast address will return an error(status `failure`).\
 > Even though, many reserved addresses/CIDRs are still not filtered.
